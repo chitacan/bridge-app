@@ -92,15 +92,11 @@ function onError(e) {
 
 Bridge.prototype.install = function() {
   var self  = this;
-  var addrs = [];
+  var times = 2;
 
   function onListen() {
-    var addr = this.address();
-    addr.name = this.name
-    addrs.push(addr);
-
-    if (addrs.length > 1) {
-      self.emit('install', addrs);
+    if (times-- < 2) {
+      self.emit('install');
     }
   }
 

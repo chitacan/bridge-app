@@ -2,8 +2,8 @@ var B = require('./bridge');
 
 var b = new B({});
 b.install();
-b.on('install', function(addrs) {
-  console.log(addrs);
+b.on('install', function() {
+  console.log('installed');
   console.log(b.getConnection());
 });
 b.on('connect', function(c) {
