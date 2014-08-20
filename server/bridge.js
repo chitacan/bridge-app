@@ -4,21 +4,24 @@ exports = module.exports = Bridge;
 var net    = require('net')
   , util   = require('util')
   , events = require('events')
+  , crypto = require('crypto')
 
 function Bridge(options) {
   events.EventEmitter.call(this);
 
-  this.port_d = options.port       || 0;
-  this.port_c = options.clientPort || 0;
-
+  this.id;
   this.cache;
   this.socket_d;
   this.socket_c;
 
   this.pipe = pipe;
+  this.generateId = generateId;
 
   this.adbd = createServer.call(this, 'adbd', onConnectDaemon);
   this.adbc = createServer.call(this, 'adbc', onConnectClient);
+
+  this.adbd.port = options.dPort || 0;
+  this.adbc.port = options.cPort || 0;
 }
 
 util.inherits(Bridge, events.EventEmitter);
@@ -29,6 +32,13 @@ function createServer(name, cb) {
   server.bridge = this;
   server.maxConnection = 1;
   return server;
+}
+
+function generateId() {
+  var unique = '' + this.adbd.port + this.adbc.port;
+  var sha = crypto.createHash('sha1');
+  sha.update(unique);
+  this.id = sha.digest('hex');
 }
 
 function pipe() {
@@ -91,17 +101,19 @@ function onError(e) {
 }
 
 Bridge.prototype.install = function() {
-  var self  = this;
+  var self = this;
   var times = 2;
 
   function onListen() {
+    this.port = this.address().port;
     if (times-- < 2) {
+      self.generateId();
       self.emit('install');
     }
   }
 
-  this.adbd.listen(this.Port_d, onListen);
-  this.adbc.listen(this.port_c, onListen);
+  this.adbd.listen(this.adbd.port, onListen);
+  this.adbc.listen(this.adbc.port, onListen);
 }
 
 Bridge.prototype.removal = function() {
@@ -117,8 +129,14 @@ Bridge.prototype.removal = function() {
 }
 
 Bridge.prototype.getConnection = function() {
-  return [
-    { type: 'adbd', isConnected: !!this.socket_d && this.socket_d.writable },
-    { type: 'adbc', isConnected: !!this.socket_c && this.socket_c.writable }
-  ]
+  return {
+    adbd: { 
+      isConnected: !!this.socket_d && this.socket_d.writable, 
+      port: this.adbd.port
+    },
+    adbc : {
+      isConnected: !!this.socket_c && this.socket_c.writable,
+      port: this.adbc.port
+    }
+  }
 }
