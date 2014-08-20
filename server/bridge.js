@@ -31,6 +31,9 @@ function createServer(name, cb) {
   server.name = name;
   server.bridge = this;
   server.maxConnection = 1;
+  server.on('error', function(e) {
+    this.bridge.emit('error', e);
+  });
   return server;
 }
 
@@ -84,7 +87,6 @@ function onConnectDaemon(c) {
   }
 }
 
-// socket callbacks
 function onEnd() {
   this.server.bridge.emit('end', this);
 }
