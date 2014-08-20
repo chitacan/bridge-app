@@ -32,7 +32,6 @@ function createServer(name, cb) {
 }
 
 function pipe() {
-  console.log('pipe');
   this.socket_d.pipe(this.socket_c);
   this.socket_c.pipe(this.socket_d);
 }
@@ -70,7 +69,6 @@ function onConnectDaemon(c) {
   bridge.socket_d = c;
   bridge.emit('connect', c);
   if (bridge.cache) {
-    console.log('write cache');
     c.write(bridge.cache);
     bridge.pipe();
   }
