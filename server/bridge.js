@@ -6,8 +6,10 @@ var net    = require('net')
   , events = require('events')
   , crypto = require('crypto')
 
-function Bridge(options) {
+function Bridge() {
   events.EventEmitter.call(this);
+
+  var opt = arguments[0] || {};
 
   this.id;
   this.cache;
@@ -20,8 +22,8 @@ function Bridge(options) {
   this.adbd = createServer.call(this, 'adbd', onConnectDaemon);
   this.adbc = createServer.call(this, 'adbc', onConnectClient);
 
-  this.adbd.port = options.dPort || 0;
-  this.adbc.port = options.cPort || 0;
+  this.adbd.port = opt.dPort || 0;
+  this.adbc.port = opt.cPort || 0;
 }
 
 util.inherits(Bridge, events.EventEmitter);

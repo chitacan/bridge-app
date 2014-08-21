@@ -1,6 +1,6 @@
 var B = require('./bridge');
 
-var b = new B({});
+var b = new B();
 b.install();
 b.on('install', function() {
   console.log('installed : ' + b.id);
