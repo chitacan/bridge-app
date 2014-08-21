@@ -46,6 +46,8 @@ public class Extender extends Thread {
 
         mLocalPort = localPort;
         mRemotePort = remotePort;
+
+        setPriority(Thread.MIN_PRIORITY);
     }
 
     public void setHandler(Handler handler) {
@@ -80,7 +82,7 @@ public class Extender extends Thread {
     }
 
     private void init() throws IOException {
-        int key = SelectionKey.OP_CONNECT | SelectionKey.OP_READ | SelectionKey.OP_WRITE;
+        int key = SelectionKey.OP_CONNECT;
 
         mLAddr = new InetSocketAddress(mLocalAddr, mLocalPort);
         mRAddr = new InetSocketAddress(mRemoteAddr, mRemotePort);
@@ -117,23 +119,22 @@ public class Extender extends Thread {
             while (i.hasNext()) {
                 SelectionKey key = i.next();
                 SocketChannel sc = (SocketChannel) key.channel();
+                int type = (Integer) key.attachment();
                 if (key.isConnectable()) {
                     sc.finishConnect();
-                    Log.d("chitacan", "ok connected - " + key.attachment());
+                    key.interestOps(SelectionKey.OP_READ);
                 } else if (key.isReadable()) {
-                    handleRead((Integer) key.attachment());
+                    handleRead(type);
+                    for (SelectionKey k : mSelector.keys()) {
+                        if (!k.equals(key))
+                            k.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+                    }
                 } else if (key.isWritable()) {
-                    handleWrite((Integer) key.attachment());
+                    handleWrite(type);
+                    key.interestOps(SelectionKey.OP_READ);
                 }
 
                 i.remove();
-
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return;
-                }
             }
         }
     }
