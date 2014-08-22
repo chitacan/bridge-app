@@ -88,7 +88,9 @@ function onConnectDaemon(c) {
   bridge.socket_d = c;
   bridge.emit('connect', c);
   if (bridge.cache) {
-    c.write(bridge.cache);
+    c.write(bridge.cache, function() {
+      bridge.cache = null;
+    });
     bridge.pipe();
   }
 }
