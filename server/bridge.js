@@ -80,7 +80,7 @@ function onConnectClient(c) {
 function onConnectDaemon(c) {
   var bridge = this.bridge;
 
-  c.setKeepAlive(true, 10*1000);
+  c.setKeepAlive(true, 30*1000);
   c.on('end', onEnd);
   c.on('close', onClose);
   c.on('error', onError);
