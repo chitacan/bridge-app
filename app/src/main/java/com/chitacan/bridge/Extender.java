@@ -10,6 +10,7 @@ import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.Iterator;
 
 /**
@@ -73,7 +74,11 @@ public class Extender extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
             setStatus(e.getMessage());
-        }catch (CancelledKeyException e) {
+        } catch (CancelledKeyException e) {
+            e.printStackTrace();
+            setStatus(e.getMessage());
+        } catch (UnresolvedAddressException e) {
+            // no connectiom. (airplane mode)
             e.printStackTrace();
             setStatus(e.getMessage());
         } finally {
