@@ -36,10 +36,6 @@ function createServer(name, cb) {
   server.on('error', function(e) {
     this.bridge.emit('error', e);
   });
-  server.on('timeout', function(e) {
-    console.log(e);
-    console.log('timeout on server : ' + name);
-  });
   return server;
 }
 
