@@ -4,6 +4,7 @@
   "description": "Bridge your adb connection to wherever you want",
   "main": "index.js",
   "scripts": {
+    "start": "DEBUG=* node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/chitacan/adb-bridge/issues"
   },
-  "homepage": "https://github.com/chitacan/adb-bridge"
+  "homepage": "https://github.com/chitacan/adb-bridge",
+  "dependencies": {
+    "debug": "^1.0.4"
+  }
 }

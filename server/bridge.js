@@ -5,6 +5,7 @@ var net    = require('net')
   , util   = require('util')
   , events = require('events')
   , crypto = require('crypto')
+  , D      = require('debug')('bridge')
 
 function Bridge() {
   events.EventEmitter.call(this);
@@ -93,6 +94,7 @@ function onConnectDaemon(c) {
 
 function onEnd() {
   this.server.bridge.emit('end', this);
+  D(this.server.name + ' end');
 }
 
 function onClose() {
@@ -100,10 +102,12 @@ function onClose() {
   if (bridge.cache)
     bridge.cache = null;
   bridge.emit('close', this);
+  D(this.server.name + ' close');
 }
 
 function onError(e) {
   this.server.bridge.emit('error', e);
+  D(this.server.name + ' error ---');
 }
 
 Bridge.prototype.install = function() {
