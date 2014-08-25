@@ -129,9 +129,11 @@ Bridge.prototype.install = function() {
 Bridge.prototype.removal = function(closeServer) {
   closeServer = closeServer || false;
   if (this.socket_d) {
+    this.socket_d.end();
     this.socket_d.destroy();
   }
   if (this.socket_c) {
+    this.socket_c.end();
     this.socket_c.destroy();
   }
 
