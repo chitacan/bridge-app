@@ -17,4 +17,5 @@ b.on('close', function(c) {
 });
 b.on('error', function(e) {
   D(e);
+  b.removal();
 });

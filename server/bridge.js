@@ -126,7 +126,8 @@ Bridge.prototype.install = function() {
   this.adbc.listen(this.adbc.port, onListen);
 }
 
-Bridge.prototype.removal = function() {
+Bridge.prototype.removal = function(closeServer) {
+  closeServer = closeServer || false;
   if (this.socket_d) {
     this.socket_d.destroy();
   }
@@ -134,8 +135,10 @@ Bridge.prototype.removal = function() {
     this.socket_c.destroy();
   }
 
-  this.adbd.close();
-  this.adbc.close();
+  if (closeServer) {
+    this.adbd.close();
+    this.adbc.close();
+  }
 }
 
 Bridge.prototype.getConnection = function() {
