@@ -55,7 +55,7 @@ function pipe() {
 function onConnectClient(c) {
   var bridge = this.bridge;
 
-  c.setKeepAlive(true, 30*1000);
+  c.setKeepAlive(true);
   c.on('end', onEnd);
   c.on('close', onClose);
   c.on('error', onError);
@@ -77,7 +77,7 @@ function onConnectClient(c) {
 function onConnectDaemon(c) {
   var bridge = this.bridge;
 
-  c.setKeepAlive(true, 30*1000);
+  c.setKeepAlive(true);
   c.on('end', onEnd);
   c.on('close', onClose);
   c.on('error', onError);
