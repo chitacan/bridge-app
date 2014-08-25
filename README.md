@@ -8,7 +8,13 @@ Bridge your adb connection to wherever you want.
 
 This project contains client (under `app/`) & server (under `server/`).
 
-To Run app,
+You have to restart your Android device's adbd on TCP mode to extend it
+
+```
+$ adb tcpip <PORT>
+```
+
+To Install app,
 
 ```
 $ ./gradlew assembleDebug
