@@ -14,17 +14,11 @@ You have to restart your Android device's adbd on TCP mode to extend it
 $ adb tcpip <PORT>
 ```
 
-To Install app,
+To Build & Install app,
 
 ```
 $ ./gradlew assembleDebug
 $ adb install app/build/output/apk/app-debug.apk
 ```
 
-To Run server,
-
-```
-$ cd server
-$ npm install
-$ node index.js
-```
+To Run server, see `server/README.md`
