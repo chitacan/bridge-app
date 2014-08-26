@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  div(ng-app='bridge', ng-controller='statusController')
+    h1 #{title}
+    button(ng-click='create()') Create Bridge
+    ul
+      li(ng-repeat='bridge in bridges', ng-mouseenter='update(bridge.id, $index)')
+        div
+          p id : {{ bridge.id }}
+          p daemon port : {{ bridge.conn.adbd.port }} {{ bridge.conn.adbd.isConnected }}
+          p client port : {{ bridge.conn.adbc.port }} {{ bridge.conn.adbc.isConnected }}
+          button(ng-click='delete(bridge.id)') Delete
+block script
+  script(src='/static/javascripts/index.js')
