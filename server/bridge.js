@@ -1,41 +1,50 @@
-module.exports = function(io) {
-  var _ = require('lodash');
-  var debug = require('debug');
-  var debug_c = debug('server:client');
-  var debug_d = debug('server:deamon');
+module.exports = Bridge;
 
-  var client = io.of('/bridge/client');
-  var daemon = io.of('/bridge/daemon');
+var _       = require('lodash')
+  , debug   = require('debug')
+  , debug_c = debug('server:client')
+  , debug_d = debug('server:deamon');
 
-  client.on('connection', function(socket) {
-    if(_.size(this.connected) > 1) {
-      socket.disconnect();
-      return;
-    }
+function Bridge(io) {
+  if (!(this instanceof Bridge)) {
+    return new Bridge(io);
+  }
 
-    debug_c('connected : ' + socket.id);
-    socket.on('data', function(data) {
-      daemon.emit('data', data);
-    });
-    socket.on('disconnect', function() {
-      debug_c('disconnected : ' + socket.id);
-    });
+  this.client = io.of('/bridge/client');
+  this.daemon = io.of('/bridge/daemon');
+
+  this.client.on('connection', onClientConnect);
+  this.daemon.on('connection', onDaemonConnect);
+}
+
+function onClientConnect(socket) {
+  if(_.size(this.connected) > 1) {
+    socket.disconnect();
+    return;
+  }
+
+  debug_c('connected : ' + socket.id);
+  socket.on('data', function(data) {
+    daemon.emit('data', data);
   });
+  socket.on('disconnect', function() {
+    debug_c('disconnected : ' + socket.id);
+  });
+}
 
-  daemon.on('connection', function(socket) {
-    if(_.size(this.connected) > 1) {
-      socket.disconnect();
-      return;
+function onDaemonConnect(socket) {
+  if(_.size(this.connected) > 1) {
+    socket.disconnect();
+    return;
+  }
+
+  debug_d('connected : ' + socket.id);
+  socket.on('res', function(data) {
+    if (data.binary) {
+      client.emit('res', data);
     }
-
-    debug_d('connected : ' + socket.id);
-    socket.on('res', function(data) {
-      if (data.binary) {
-        client.emit('res', data);
-      }
-    });
-    socket.on('disconnect', function() {
-      debug_d('disconnected : ' + socket.id);
-    });
+  });
+  socket.on('disconnect', function() {
+    debug_d('disconnected : ' + socket.id);
   });
 }

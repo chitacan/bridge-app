@@ -10,7 +10,7 @@ var routes = require('./routes/index');
 var app = express();
 var server = http.Server(app);
 var io = require('socket.io').listen(server);
-require('./bridge')(io);
+var bridge = require('./bridge')(io);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
