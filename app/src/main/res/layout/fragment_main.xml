@@ -27,10 +27,11 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:maxLength="5"
-        android:id="@+id/edit_remote_port"
+        android:inputType="textUri"
+        android:singleLine="true"
+        android:id="@+id/edit_remote_addr"
         android:layout_below="@+id/edit_local_port"
+        android:text="http://redribbon.io:3000/bridge/daemon"
         android:hint="remote port number"
         android:layout_alignParentStart="true" />
 
@@ -38,7 +39,7 @@
         android:id="@+id/btn_start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edit_remote_port"
+        android:layout_below="@id/edit_remote_addr"
         android:text="start" />
 
     <Button
