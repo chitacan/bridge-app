@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var debug = require('debug')('express');
+var debug = require('debug')('server:excute');
 var app = require('../app').app;
 var server = require('../app').server;
 

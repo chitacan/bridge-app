@@ -1,0 +1,24 @@
+{
+  "name": "bridge-client",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "DEBUG=client:* node ./bin/bridge",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chitacan/adb-bridge.git"
+  },
+  "author": "chitacan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chitacan/adb-bridge/issues"
+  },
+  "homepage": "https://github.com/chitacan/adb-bridge",
+  "dependencies": {
+    "debug": "^2.0.0",
+    "socket.io-client": "^1.0.6"
+  }
+}
