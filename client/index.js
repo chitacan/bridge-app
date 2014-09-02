@@ -19,7 +19,9 @@ var server = net.createServer(function(c) {
   });
 });
 server.maxConnection = 1;
-server.listen(8080);
+server.listen(8080, function() {
+  debug_a('Socket server listening on port ' + 8080);
+});
 
 var socket = require('socket.io-client')('http://localhost:3000/bridge/client');
 
