@@ -1,16 +1,16 @@
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var express      = require('express')
+  , http         = require('http')
+  , path         = require('path')
+  , logger       = require('morgan')
+  , cookieParser = require('cookie-parser')
+  , bodyParser   = require('body-parser')
 
-var routes = require('./routes/index');
+var app    = express()
+  , server = http.Server(app)
+  , io     = require('socket.io').listen(server)
+  , bridge = require('./bridge')(io);
 
-var app = express();
-var server = http.Server(app);
-var io = require('socket.io').listen(server);
-var bridge = require('./bridge')(io);
+var routes = require('./routes/index')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
