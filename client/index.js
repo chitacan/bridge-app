@@ -23,7 +23,8 @@ server.listen(8080, function() {
   debug_a('Socket server listening on port ' + 8080);
 });
 
-var socket = require('socket.io-client')('http://localhost:3000/bridge/client');
+var URL    = 'http://chitacan.redribbon.io/bridge/client';
+var socket = require('socket.io-client')(URL);
 
 socket.on('connect', function(){
   debug_c('connected');
