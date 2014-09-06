@@ -3,9 +3,9 @@ module.exports = Bridge;
 var _       = require('lodash')
   , debug   = require('debug')
   , debug_c = debug('server:client')
-  , debug_d = debug('server:deamon');
+  , debug_d = debug('server:daemon');
 
-var DAEMON_NSP = '/bridge/deamon'
+var DAEMON_NSP = '/bridge/daemon'
   , CLIENT_NSP = '/bridge/client';
 
 function Bridge(io) {
