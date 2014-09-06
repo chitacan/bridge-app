@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "DEBUG=express:application,server:* node ./bin/www",
+    "debug": "DEBUG=express:application,server:* node --debug-brk ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "bower install"
   },
