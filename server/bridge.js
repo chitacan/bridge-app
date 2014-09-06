@@ -14,8 +14,8 @@ function Bridge(io) {
   }
   this.io = io;
 
-  this.client = io.of(DAEMON_NSP);
-  this.daemon = io.of(CLIENT_NSP);
+  this.client = io.of(CLIENT_NSP);
+  this.daemon = io.of(DAEMON_NSP);
 
   this.client.on('connection', onClientConnect);
   this.daemon.on('connection', onDaemonConnect);
