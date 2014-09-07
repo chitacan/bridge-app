@@ -1,2 +1,18 @@
 #!/usr/bin/env node
-require('../');
+
+var program = require('commander')
+  , debug   = require('debug')('client:executable');
+
+program
+  .version(require('../package').version)
+  .option('-u, --url <url>'  , 'specify server url to connect', 'http://localhost:9500')
+  .option('-p, --port <port>', 'specify port number to listen', 0)
+  .parse(process.argv);
+
+debug('option.url  : ' + program.url);
+debug('option.port : ' + program.port);
+
+require('../')({
+  url  : program.url,
+  port : program.port
+});
