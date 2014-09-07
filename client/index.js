@@ -19,8 +19,9 @@ var server = net.createServer(function(c) {
   });
 });
 server.maxConnection = 1;
-server.listen(8080, function() {
-  debug_a('Socket server listening on port ' + 8080);
+server.listen(0, function() {
+  this.port = this.address().port;
+  debug_a('Socket server listening on port ' + this.port);
 });
 
 var URL    = 'http://chitacan.redribbon.io/bridge/client';
