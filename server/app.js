@@ -11,6 +11,7 @@ var app    = express()
   , bridge = require('./bridge')(io);
 
 var routes = require('./routes/index')
+var api    = require('./routes/api')(io)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,7 +23,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/'    , routes);
+app.use('/api' , api);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
