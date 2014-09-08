@@ -2,7 +2,10 @@
   "name": "bridge-client",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "bin": {
+    "bridge": "./bin/bridge"
+  },
   "scripts": {
     "start": "DEBUG=client:* node ./bin/bridge",
     "test": "echo \"Error: no test specified\" && exit 1"
