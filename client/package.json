@@ -23,6 +23,8 @@
   "dependencies": {
     "commander": "^2.3.0",
     "debug": "^2.0.0",
+    "inquirer": "^0.7.1",
+    "restler": "^3.2.2",
     "socket.io-client": "^1.0.6"
   }
 }
