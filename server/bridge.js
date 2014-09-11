@@ -31,6 +31,15 @@ function onClientConnect(socket) {
 
   var daemon = this.server.of(DAEMON_NSP);
   debug_c('connected : ' + socket.id);
+  socket.on('bc-host', function(data) {
+    data.toString = function() {
+      return this.type
+      .concat(' ').concat(this.arch)
+      .concat(' ').concat(this.hostname)
+      .concat(' ').concat(this.version)
+    }
+    this.hostInfo = data;
+  });
   socket.on('data', function(data) {
     daemon.emit('data', data);
   });

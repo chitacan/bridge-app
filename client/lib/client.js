@@ -2,6 +2,7 @@ module.exports = Client;
 
 var net   = require('net')
   , u     = require('url')
+  , os    = require('os')
   , debug = require('debug')
   , debug_a = debug('client:adb')
   , debug_c = debug('client:bridge');
@@ -51,6 +52,12 @@ function createSocket(url) {
 
   socket.on('connect', function(){
     debug_c('connected');
+    socket.emit('bc-host', {
+      type     : os.type(),
+      arch     : os.arch(),
+      hostname : os.hostname(),
+      version  : os.release()
+    });
   });
   socket.on('data', function(data){
     debug_c('client data');
