@@ -15,13 +15,24 @@ r.route('/bridge/client')
 
 r.route('/bridge/daemon')
   .get(function(req, res) {
-    var ids = getSocketIds('/bridge/daemon')
+    var ids = getSocketInfo('/bridge/daemon')
     res.json(ids);
   });
 
 function getSocketIds(namespace) {
   var nsps = r.io.of(namespace)
   return _.keys(nsps.connected);
+}
+
+function getSocketInfo(namespace) {
+  var nsps = r.io.of(namespace)
+  var sockets = _.values(nsps.connected);
+  return _.map(sockets, function(val) {
+    return {
+      name  : val.hostInfo.toString(),
+      value : val.id
+    }
+  });
 }
 
 module.exports = function(io) {

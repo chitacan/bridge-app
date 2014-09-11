@@ -167,7 +167,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                 @Override
                 public void call(Object... args) {
                     isConnected = true;
-                    mSocket.emit("bd-device", deviceInfo());
+                    mSocket.emit("bd-host", hostInfo());
                     setStatus("server connected");
                 }
 
@@ -210,7 +210,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             });
         }
 
-        private JSONObject deviceInfo() {
+        private JSONObject hostInfo() {
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("brand"        , Build.BRAND);
