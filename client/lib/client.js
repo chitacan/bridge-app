@@ -48,6 +48,7 @@ Client.prototype.createServer = function(port) {
 }
 
 Client.prototype.createSocket = function(url) {
+  var self = this;
   debug_c('connecting to : ' + url);
   var socket = require('socket.io-client')(url);
 
@@ -68,7 +69,7 @@ Client.prototype.createSocket = function(url) {
   });
   socket.on('res', function(data) {
     if (data.binary) {
-      server.socket.write(data.binary);
+      self.server.socket.write(data.binary);
     }
   });
   socket.on('error', function(e) {
