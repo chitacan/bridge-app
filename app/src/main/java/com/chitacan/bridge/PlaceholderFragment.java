@@ -6,6 +6,7 @@ package com.chitacan.bridge;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,7 +48,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
     private TextView mStatus     = null;
 
     private EditText mLocalPortNumber  = null;
-    private EditText mRemoteAddr       = null;
+    private EditText mHost = null;
 
     private Handler mHandler = new Handler() {
 
@@ -85,7 +86,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
         rootView.findViewById(R.id.btn_start).setOnClickListener(this);
         rootView.findViewById(R.id.btn_stop) .setOnClickListener(this);
         mStatus = (TextView) rootView.findViewById(R.id.section_status);
-        mRemoteAddr = (EditText) rootView.findViewById(R.id.edit_remote_addr);
+        mHost = (EditText) rootView.findViewById(R.id.edit_remote_addr);
         mLocalPortNumber  = (EditText) rootView.findViewById(R.id.edit_local_port);
         return rootView;
     }
@@ -117,16 +118,23 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
     }
 
     private void startBridge() {
-        String remoteAddr = mRemoteAddr.getText().toString();
-        String localPort  = mLocalPortNumber .getText().toString();
+        String host      = mHost.getText().toString();
+        String localPort = mLocalPortNumber.getText().toString();
 
-        if (remoteAddr.length() == 0 || localPort.length() == 0) {
-            Toast.makeText(getActivity(), "no remote port number", Toast.LENGTH_LONG).show();
+        if (host.length() == 0 || localPort.length() == 0) {
+            Toast.makeText(getActivity(), "no host name or port number", Toast.LENGTH_LONG).show();
             return;
         }
 
+        Uri.Builder builder = new Uri.Builder();
+        builder
+                .scheme("http")
+                .authority(mHost.getText().toString())
+                .appendPath("bridge")
+                .appendPath("daemon");
+
         if (mServer == null) {
-            mServer = new ServerBridge(remoteAddr);
+            mServer = new ServerBridge(builder.toString());
             mServer.subscribe();
         }
 
@@ -406,7 +414,6 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
 
             Message msg = mStatusHandler.obtainMessage();
             msg.what = 0;
-            msg.obj = status;
             mStatusHandler.sendMessage(msg);
         }
     }
