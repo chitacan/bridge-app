@@ -15,13 +15,14 @@ function Client(opt) {
   var port = opt.port;
   var url  = u.resolve(opt.url, 'bridge/client');
 
-  this.server = createServer(port);
-  this.socket = createSocket(url);
+  this.server = this.createServer(port);
+  this.socket = this.createSocket(url);
 
   return this;
 }
 
-function createServer(port) {
+Client.prototype.createServer = function(port) {
+  var self = this;
   var server = net.createServer(function(c) {
     server.socket = c;
     debug_a('connected');
@@ -29,8 +30,8 @@ function createServer(port) {
       debug_a('disconnected');
     });
     c.on('data', function(chunk) {
-      if (!!socket && socket.connected) {
-        socket.emit('data', { binary: chunk });
+      if (!!self.socket && self.socket.connected) {
+        self.socket.emit('data', { binary: chunk });
       }
     });
     c.on('error', function(e) {
@@ -46,7 +47,7 @@ function createServer(port) {
   return server;
 }
 
-function createSocket(url) {
+Client.prototype.createSocket = function(url) {
   debug_c('connecting to : ' + url);
   var socket = require('socket.io-client')(url);
 
