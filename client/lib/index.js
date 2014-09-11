@@ -14,10 +14,11 @@ var defaultChoices = [
 ];
 
 function request(cb) {
+  // validate url
   var url  = u.resolve(option.url, 'api/bridge/daemon');
   rest.get(url)
   .on('complete', function(data) {
-    if (data)
+    if (!(data instanceof Error))
       cb(data.concat(defaultChoices));
   })
   .on('fail', function(err, res) {
