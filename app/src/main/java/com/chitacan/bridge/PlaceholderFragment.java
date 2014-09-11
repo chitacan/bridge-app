@@ -126,16 +126,16 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             return;
         }
 
-        Uri.Builder builder = new Uri.Builder();
-        builder
-                .scheme("http")
-                .authority(mHost.getText().toString())
-                .appendPath("bridge")
-                .appendPath("daemon");
-
         if (mServer == null) {
+            Uri.Builder builder = new Uri.Builder();
+            builder
+                    .scheme("http")
+                    .authority(mHost.getText().toString())
+                    .appendPath("bridge")
+                    .appendPath("daemon");
+
             mServer = new ServerBridge(builder.toString());
-            mServer.subscribe();
+            mServer.setHandler(mHandler);
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
@@ -145,8 +145,9 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             mDaemon.start();
         }
         mServer.setDaemon(mDaemon);
-        mServer.setHandler(mHandler);
         mServer.connect();
+
+        mStatus.setText("connecting...");
     }
 
     class ServerBridge {
@@ -155,20 +156,29 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
         private boolean isConnected = false;
         private DaemonBridge mDaemon = null;
         private Handler mStatusHandler = null;
+        private IO.Options mOpt = new IO.Options();
+        private String mUrl = null;
 
         public ServerBridge(String url) {
-            IO.Options opt = new IO.Options();
-            opt.reconnectionDelay    = 10 * 1000;
-            opt.reconnectionDelayMax = 20 * 1000;
+            mUrl = url;
 
+            mOpt.forceNew             = true;
+            mOpt.reconnectionDelay    = 10 * 1000;
+            mOpt.reconnectionDelayMax = 20 * 1000;
+
+            createSocket();
+        }
+
+        private void createSocket() {
             try {
-                mSocket = IO.socket(url, opt);
+                mSocket = IO.socket(mUrl, mOpt);
+                subscribe();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        public void subscribe() {
+        private void subscribe() {
             mSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
 
                 @Override
@@ -238,10 +248,15 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
         }
 
         public Socket connect() {
+            if (mSocket != null) {
+                disconnect();
+                createSocket();
+            }
             return mSocket.connect();
         }
 
         public void disconnect() {
+            mSocket.close();
             mSocket.disconnect();
         }
 
@@ -414,6 +429,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
 
             Message msg = mStatusHandler.obtainMessage();
             msg.what = 0;
+            msg.obj = status;
             mStatusHandler.sendMessage(msg);
         }
     }
