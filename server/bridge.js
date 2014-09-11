@@ -52,6 +52,9 @@ function onDaemonConnect(socket) {
       client.emit('res', data);
     }
   });
+  socket.on('bd-device', function(data) {
+    this.deviceInfo = data;
+  });
   socket.on('disconnect', function() {
     debug_d('disconnected : ' + socket.id);
   });
