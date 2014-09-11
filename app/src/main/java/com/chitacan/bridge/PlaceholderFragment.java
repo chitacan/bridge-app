@@ -6,6 +6,7 @@ package com.chitacan.bridge;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -166,6 +167,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                 @Override
                 public void call(Object... args) {
                     isConnected = true;
+                    mSocket.emit("bd-device", deviceInfo());
                     setStatus("server connected");
                 }
 
@@ -206,6 +208,22 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                     setStatus("server reconnecting...");
                 }
             });
+        }
+
+        private JSONObject deviceInfo() {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("brand"        , Build.BRAND);
+                obj.put("manufacturer" , Build.MANUFACTURER);
+                obj.put("model"        , Build.MODEL);
+                obj.put("type"         , Build.TYPE);
+                obj.put("version"      , Build.VERSION.RELEASE);
+                obj.put("sdk_version"  , Build.VERSION.SDK_INT);
+                return obj;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         public Socket getSocket() {
