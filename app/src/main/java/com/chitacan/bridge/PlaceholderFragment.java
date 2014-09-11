@@ -132,13 +132,12 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
 
         if (mDaemon == null || !mDaemon.isAlive()) {
             mDaemon = new DaemonBridge();
+            mDaemon.setServer(mServer);
+            mDaemon.setHandler(mHandler);
+            mDaemon.start();
         }
-
         mServer.setDaemon(mDaemon);
-        mDaemon.setServer(mServer);
-        mDaemon.setHandler(mHandler);
         mServer.setHandler(mHandler);
-        mDaemon.start();
         mServer.connect();
     }
 
