@@ -13,6 +13,7 @@ function Bridge(io) {
     return new Bridge(io);
   }
   this.io = io;
+  this.bridges = [];
 
   this.client = io.of(CLIENT_NSP);
   this.daemon = io.of(DAEMON_NSP);
@@ -21,6 +22,11 @@ function Bridge(io) {
   this.daemon.on('connection', onDaemonConnect);
 
   return this;
+}
+
+Bridge.prototype.install = function(data) {
+  this.bridges.push(data);
+  // find connected sockets by given ids
 }
 
 function onClientConnect(socket) {

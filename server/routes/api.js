@@ -5,6 +5,15 @@ var r = express.Router();
 r.route('/bridge')
   .get(function(req, res) {
     res.json({ result: 'hello' });
+  })
+  .put(function(req, res) {
+    var clientId = req.param('clientId');
+    var daemonId = req.param('daemonId');
+    r.bridge.install({
+      clientId : clientId,
+      daemonId : daemonId
+    });
+    res.json({ result: 'created' });
   });
 
 r.route('/bridge/client')
@@ -20,12 +29,12 @@ r.route('/bridge/daemon')
   });
 
 function getSocketIds(namespace) {
-  var nsps = r.io.of(namespace)
+  var nsps = r.bridge.io.of(namespace)
   return _.keys(nsps.connected);
 }
 
 function getSocketInfo(namespace) {
-  var nsps = r.io.of(namespace)
+  var nsps = r.bridge.io.of(namespace)
   var sockets = _.values(nsps.connected);
   return _.map(sockets, function(val) {
     return {
@@ -35,7 +44,7 @@ function getSocketInfo(namespace) {
   });
 }
 
-module.exports = function(io) {
-  r.io = io;
+module.exports = function(bridge) {
+  r.bridge = bridge;
   return r;
 };

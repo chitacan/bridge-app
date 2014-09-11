@@ -11,7 +11,7 @@ var app    = express()
   , bridge = require('./bridge')(io);
 
 var routes = require('./routes/index')
-var api    = require('./routes/api')(io)
+var api    = require('./routes/api')(bridge)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
