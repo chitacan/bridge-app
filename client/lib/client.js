@@ -15,6 +15,7 @@ function Client(opt) {
   var port = opt.port;
   var url  = u.resolve(opt.url, 'bridge/client');
 
+  this.daemonId = opt.daemonId || '';
   this.server = this.createServer(port);
   this.socket = this.createSocket(url);
 
