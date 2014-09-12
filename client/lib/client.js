@@ -12,17 +12,14 @@ function Client(opt) {
     return new Client(opt);
   }
 
-  var port = opt.port;
-  var url  = u.resolve(opt.url, 'bridge/client');
-
-  this.daemonId = opt.daemonId || '';
-  this.server = this.createServer(port);
-  this.socket = this.createSocket(url);
+  this.opt = opt;
+  this.server = this.createServer();
+  this.socket = this.createSocket();
 
   return this;
 }
 
-Client.prototype.createServer = function(port) {
+Client.prototype.createServer = function() {
   var self = this;
   var server = net.createServer(function(c) {
     server.socket = c;
@@ -40,7 +37,7 @@ Client.prototype.createServer = function(port) {
     });
   });
   server.maxConnection = 1;
-  server.listen(port, function() {
+  server.listen(this.opt.port, function() {
     this.port = this.address().port;
     debug_a('Socket server listening on port ' + this.port);
   });
@@ -48,8 +45,9 @@ Client.prototype.createServer = function(port) {
   return server;
 }
 
-Client.prototype.createSocket = function(url) {
+Client.prototype.createSocket = function() {
   var self = this;
+  var url = u.resolve(this.opt.url, 'bridge/client');
   debug_c('connecting to : ' + url);
   var socket = require('socket.io-client')(url);
 
