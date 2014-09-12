@@ -3,6 +3,7 @@ module.exports = Client;
 var net   = require('net')
   , u     = require('url')
   , os    = require('os')
+  , rest  = require('restler')
   , debug = require('debug')
   , debug_a = debug('client:adb')
   , debug_c = debug('client:bridge');
@@ -46,8 +47,9 @@ Client.prototype.createServer = function() {
 }
 
 Client.prototype.createSocket = function() {
-  var self = this;
-  var url = u.resolve(this.opt.url, 'bridge/client');
+  var self     = this;
+  var url      = u.resolve(this.opt.url, 'bridge/client');
+  var daemonId = this.opt.daemonId;
   debug_c('connecting to : ' + url);
   var socket = require('socket.io-client')(url);
 
@@ -59,6 +61,13 @@ Client.prototype.createSocket = function() {
       hostname : os.hostname(),
       version  : os.release()
     });
+
+    if (daemonId) {
+      installBridge(self.opt.url, {
+        clientId: socket.io.engine.id,
+        daemonId: daemonId
+      });
+    }
   });
   socket.on('data', function(data){
     debug_c('client data');
@@ -76,4 +85,11 @@ Client.prototype.createSocket = function() {
   });
 
   return socket;
+}
+
+function installBridge(url, ids) {
+  url = u.resolve(url, 'api/bridge');
+  rest.put(url, { data: ids })
+  .on('complete', function(data) {
+  });
 }
