@@ -26,15 +26,16 @@ function Bridge(io) {
 
 Bridge.prototype.install = function(data) {
   this.bridges.push(data);
-  // find connected sockets by given ids
+  var clientSocket = this.client.connected[data.clientId];
+  var daemonSocket = this.daemon.connected[data.daemonId];
+
+  if (clientSocket)
+    clientSocket.bridgeId = data.daemonId;
+  if (daemonSocket)
+    daemonSocket.bridgeId = data.clientId;
 }
 
 function onClientConnect(socket) {
-  if(_.size(this.connected) > 1) {
-    socket.disconnect();
-    return;
-  }
-
   var daemon = this.server.of(DAEMON_NSP);
   debug_c('connected : ' + socket.id);
   socket.on('bc-host', function(data) {
@@ -47,7 +48,7 @@ function onClientConnect(socket) {
     this.hostInfo = data;
   });
   socket.on('data', function(data) {
-    daemon.emit('data', data);
+    daemon.to(this.bridgeId).emit('data', data);
   });
   socket.on('disconnect', function() {
     debug_c('disconnected : ' + socket.id);
@@ -55,16 +56,11 @@ function onClientConnect(socket) {
 }
 
 function onDaemonConnect(socket) {
-  if(_.size(this.connected) > 1) {
-    socket.disconnect();
-    return;
-  }
-
   var client = this.server.of(CLIENT_NSP);
   debug_d('connected : ' + socket.id);
   socket.on('res', function(data) {
     if (data.binary) {
-      client.emit('res', data);
+      client.to(this.bridgeId).emit('res', data);
     }
   });
   socket.on('bd-host', function(data) {

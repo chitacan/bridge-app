@@ -33,6 +33,7 @@ function getSocketIds(namespace) {
   return _.keys(nsps.connected);
 }
 
+// find unbridged socket & return it
 function getSocketInfo(namespace) {
   var nsps = r.bridge.io.of(namespace)
   var sockets = _.values(nsps.connected);
