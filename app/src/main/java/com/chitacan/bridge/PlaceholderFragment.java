@@ -188,7 +188,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                     setStatus("server connected");
                 }
 
-            }).on("data", new Emitter.Listener() {
+            }).on("bs-data", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
@@ -382,7 +382,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                             JSONObject req = new JSONObject();
                             req.put("hello", "req");
                             req.put("binary", b);
-                            mServer.getSocket().emit("res", req);
+                            mServer.getSocket().emit("bd-data", req);
                         }
                     }
                     i.remove();

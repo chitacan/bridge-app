@@ -47,8 +47,8 @@ function onClientConnect(socket) {
     }
     this.hostInfo = data;
   });
-  socket.on('data', function(data) {
-    daemon.to(this.bridgeId).emit('data', data);
+  socket.on('bc-data', function(data) {
+    daemon.to(this.bridgeId).emit('bs-data', data);
   });
   socket.on('disconnect', function() {
     debug_c('disconnected : ' + socket.id);
@@ -58,9 +58,9 @@ function onClientConnect(socket) {
 function onDaemonConnect(socket) {
   var client = this.server.of(CLIENT_NSP);
   debug_d('connected : ' + socket.id);
-  socket.on('res', function(data) {
+  socket.on('bd-data', function(data) {
     if (data.binary) {
-      client.to(this.bridgeId).emit('res', data);
+      client.to(this.bridgeId).emit('bs-data', data);
     }
   });
   socket.on('bd-host', function(data) {

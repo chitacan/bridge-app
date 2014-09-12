@@ -30,7 +30,7 @@ Client.prototype.createServer = function() {
     });
     c.on('data', function(chunk) {
       if (!!self.socket && self.socket.connected) {
-        self.socket.emit('data', { binary: chunk });
+        self.socket.emit('bc-data', { binary: chunk });
       }
     });
     c.on('error', function(e) {
@@ -75,7 +75,7 @@ Client.prototype.createSocket = function() {
   socket.on('disconnect', function(){
     debug_c('disconnected');
   });
-  socket.on('res', function(data) {
+  socket.on('bs-data', function(data) {
     if (data.binary) {
       self.server.socket.write(data.binary);
     }
