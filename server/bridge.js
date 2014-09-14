@@ -24,15 +24,15 @@ function Bridge(io) {
   return this;
 }
 
-Bridge.prototype.install = function(data) {
-  this.bridges.push(data);
-  var clientSocket = this.client.connected[data.clientId];
-  var daemonSocket = this.daemon.connected[data.daemonId];
+Bridge.prototype.install = function(ids) {
+  this.bridges.push(ids);
+  var clientSocket = this.client.connected[ids.client];
+  var daemonSocket = this.daemon.connected[ids.daemon];
 
   if (clientSocket)
-    clientSocket.bridgeId = data.daemonId;
+    clientSocket.bridgeId = ids.daemon;
   if (daemonSocket)
-    daemonSocket.bridgeId = data.clientId;
+    daemonSocket.bridgeId = ids.client;
 }
 
 function onClientConnect(socket) {

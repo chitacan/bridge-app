@@ -7,11 +7,9 @@ r.route('/bridge')
     res.json({ result: 'hello' });
   })
   .put(function(req, res) {
-    var clientId = req.param('clientId');
-    var daemonId = req.param('daemonId');
     r.bridge.install({
-      clientId : clientId,
-      daemonId : daemonId
+      client : req.param('client'),
+      daemon : req.param('daemon')
     });
     res.json({ result: 'created' });
   });
