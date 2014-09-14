@@ -16,7 +16,7 @@ r.route('/bridge')
 
 r.route('/bridge/client')
   .get(function(req, res) {
-    var ids = getSocketIds('/bridge/client')
+    var ids = getSocketInfo('/bridge/client')
     res.json(ids);
   });
 
@@ -26,21 +26,18 @@ r.route('/bridge/daemon')
     res.json(ids);
   });
 
-function getSocketIds(namespace) {
-  var nsps = r.bridge.io.of(namespace)
-  return _.keys(nsps.connected);
-}
-
-// find unbridged socket & return it
 function getSocketInfo(namespace) {
   var nsps = r.bridge.io.of(namespace)
   var sockets = _.values(nsps.connected);
-  return _.map(sockets, function(val) {
+  return _(sockets)
+  .reject('bridgeId')
+  .map(function(val) {
     return {
       name  : val.hostInfo.toString(),
       value : val.id
     }
-  });
+  })
+  .valueOf();
 }
 
 module.exports = function(bridge) {
