@@ -17,9 +17,10 @@ function request(cb) {
   // validate url
   var url  = u.resolve(option.url, 'api/bridge/daemon');
   rest.get(url)
-  .on('complete', function(data) {
-    if (!(data instanceof Error))
-      cb(data.concat(defaultChoices));
+  .on('2XX', function(result, res) {
+    if (!(result instanceof Error)) {
+      cb(result.concat(defaultChoices));
+    }
   })
   .on('fail', function(err, res) {
     cb(defaultChoices);
