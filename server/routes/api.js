@@ -4,7 +4,7 @@ var r = express.Router();
 
 r.route('/bridge')
   .get(function(req, res) {
-    res.json({ result: 'hello' });
+    res.json(r.bridge.get());
   })
   .put(function(req, res) {
     r.bridge.install({
@@ -12,6 +12,13 @@ r.route('/bridge')
       daemon : req.param('daemon')
     });
     res.json({ result: 'created' });
+  })
+  .delete(function(req, res) {
+    r.bridge.remove({
+      client : req.param('client'),
+      daemon : req.param('daemon')
+    });
+    res.json({ result: 'removed' });
   });
 
 r.route('/bridge/client')
