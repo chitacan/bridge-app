@@ -1,7 +1,11 @@
 var client   = require('./client')
   , inquirer = require('inquirer')
   , rest     = require('restler')
-  , u        = require('url');
+  , u        = require('url')
+  , debug    = require('debug')
+  , debug_e  = debug('client:error');
+
+debug_e.log = console.error.bind(console);
 
 var option;
 
@@ -9,7 +13,7 @@ var defaultChoices = [
   new inquirer.Separator(),
   {
     name  : 'Connect without daemon',
-    value : Number.MAX_VALUE
+    value : 0
   }
 ];
 
@@ -22,15 +26,9 @@ function request(cb) {
       cb(result.concat(defaultChoices));
     }
   })
-  .on('fail', function(err, res) {
-    cb(defaultChoices);
-  })
-  .on('error', function(err, res) {
-    cb(defaultChoices);
-  })
-  .on('timeout', function() {
-    cb(defaultChoices);
-  });
+  .on('fail'   , exit)
+  .on('error'  , exit)
+  .on('timeout', exit);
 }
 
 function handleResponse(choices) {
@@ -41,12 +39,18 @@ function handleResponse(choices) {
     message : 'Select connected daemon ID',
     choices : choices
   }
-  ], function(answer) {
-    if (answer.daemonId !== Number.MAX_VALUE)
-      option.daemonId = answer.daemonId;
+  ], runClient);
+}
 
-    client(option);
-  });
+function runClient(answer) {
+  if (typeof answer.daemonId == 'string')
+    option.daemonId = answer.daemonId;
+  client(option);
+}
+
+function exit() {
+  debug_e('Server not responding...');
+  process.exit(0);
 }
 
 module.exports = function(opt) {
