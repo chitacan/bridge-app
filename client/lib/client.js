@@ -73,6 +73,7 @@ Client.prototype.createSocket = function() {
     debug_c('client data');
   });
   socket.on('disconnect', function(){
+    self.opt.daemonId = '';
     debug_c('disconnected');
   });
   socket.on('bs-data', function(data) {
