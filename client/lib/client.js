@@ -64,8 +64,8 @@ Client.prototype.createSocket = function() {
 
     if (daemonId) {
       installBridge(self.opt.url, {
-        clientId: socket.io.engine.id,
-        daemonId: daemonId
+        client: socket.io.engine.id,
+        daemon: daemonId
       });
     }
   });
