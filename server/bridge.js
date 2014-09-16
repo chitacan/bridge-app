@@ -50,6 +50,7 @@ Bridge.prototype.remove = function(ids) {
   });
   var skt = this.getSockets(removed[0]);
   setBridgeId(skt);
+  this.cache = '';
 }
 
 // support array argument
@@ -84,7 +85,6 @@ function onClientConnect(socket) {
     if (this.bridgeId)
       daemon.to(this.bridgeId).emit('bs-data', data);
     else {
-      // cache
       var cmd = data.binary.toString().slice(0, 4);
       cmd === 'CNXN' && (bridge.cache = data);
     }
