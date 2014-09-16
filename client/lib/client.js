@@ -27,6 +27,8 @@ Client.prototype.createServer = function() {
     debug_a('connected');
     c.on('close', function() {
       debug_a('disconnected');
+      if (!!self.socket && self.socket.connected)
+        self.socket.emit('bc-collapse');
     });
     c.on('data', function(chunk) {
       if (!!self.socket && self.socket.connected) {

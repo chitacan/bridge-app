@@ -76,6 +76,9 @@ function onClientConnect(socket) {
   socket.on('bc-data', function(data) {
     daemon.to(this.bridgeId).emit('bs-data', data);
   });
+  socket.on('bc-collapse', function() {
+    self.remove({client: socket.id});
+  });
   socket.on('disconnect', function() {
     debug_c('disconnected : ' + socket.id);
     self.remove({client: socket.id});
@@ -99,6 +102,9 @@ function onDaemonConnect(socket) {
       .concat(' ').concat(this.version)
     }
     this.hostInfo = data;
+  });
+  socket.on('bd-collapse', function() {
+    self.remove({daemon: socket.id});
   });
   socket.on('disconnect', function() {
     debug_d('disconnected : ' + socket.id);

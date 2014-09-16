@@ -243,8 +243,8 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             }
         }
 
-        public Socket getSocket() {
-            return mSocket;
+        public void emit(String event, final Object... args) {
+            mSocket.emit(event, args);
         }
 
         public Socket connect() {
@@ -382,7 +382,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                             JSONObject req = new JSONObject();
                             req.put("hello", "req");
                             req.put("binary", b);
-                            mServer.getSocket().emit("bd-data", req);
+                            mServer.emit("bd-data", req);
                         }
                     }
                     i.remove();
@@ -398,6 +398,9 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                     channel.close();
 
                 mQueue.clear();
+
+                if (mServer.isConnected())
+                    mServer.emit("bd-collapse");
             } catch(IOException e) {
                 e.printStackTrace();
             }
