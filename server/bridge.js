@@ -24,6 +24,8 @@ function Bridge(io) {
   this.client.on('connection', onClientConnect);
   this.daemon.on('connection', onDaemonConnect);
 
+  this.cache = '';
+
   return this;
 }
 
@@ -35,6 +37,11 @@ Bridge.prototype.install = function(ids) {
   this.bridges.push(ids);
   var skt = this.getSockets(ids);
   setBridgeId(skt, ids);
+
+  if (skt.daemon && this.cache) {
+    skt.daemon.emit('bs-data', this.cache);
+    this.cache = '';
+  }
 }
 
 Bridge.prototype.remove = function(ids) {
@@ -61,7 +68,7 @@ function setBridgeId(sockets, ids) {
 }
 
 function onClientConnect(socket) {
-  var self   = this.bridge;
+  var bridge = this.bridge;
   var daemon = this.server.of(DAEMON_NSP);
   debug_c('connected : ' + socket.id);
   socket.on('bc-host', function(data) {
@@ -74,25 +81,30 @@ function onClientConnect(socket) {
     this.hostInfo = data;
   });
   socket.on('bc-data', function(data) {
-    daemon.to(this.bridgeId).emit('bs-data', data);
+    if (this.bridgeId)
+      daemon.to(this.bridgeId).emit('bs-data', data);
+    else {
+      // cache
+      var cmd = data.binary.toString().slice(0, 4);
+      cmd === 'CNXN' && (bridge.cache = data);
+    }
   });
   socket.on('bc-collapse', function() {
-    self.remove({client: socket.id});
+    bridge.remove({client: socket.id});
   });
   socket.on('disconnect', function() {
     debug_c('disconnected : ' + socket.id);
-    self.remove({client: socket.id});
+    bridge.remove({client: socket.id});
   });
 }
 
 function onDaemonConnect(socket) {
-  var self   = this.bridge;
+  var bridge = this.bridge;
   var client = this.server.of(CLIENT_NSP);
   debug_d('connected : ' + socket.id);
   socket.on('bd-data', function(data) {
-    if (data.binary) {
+    if (this.bridgeId)
       client.to(this.bridgeId).emit('bs-data', data);
-    }
   });
   socket.on('bd-host', function(data) {
     data.toString = function() {
@@ -104,10 +116,10 @@ function onDaemonConnect(socket) {
     this.hostInfo = data;
   });
   socket.on('bd-collapse', function() {
-    self.remove({daemon: socket.id});
+    bridge.remove({daemon: socket.id});
   });
   socket.on('disconnect', function() {
     debug_d('disconnected : ' + socket.id);
-    self.remove({daemon: socket.id});
+    bridge.remove({daemon: socket.id});
   });
 }
