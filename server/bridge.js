@@ -63,8 +63,8 @@ Bridge.prototype.getSockets = function(ids) {
 
 function setBridgeId(sockets, ids) {
   ids = _.defaults(ids || {}, {client: '', daemon: ''});
-  !sockets.client || (sockets.client.bridgeId = ids.daemon);
-  !sockets.daemon || (sockets.daemon.bridgeId = ids.client);
+  sockets.client && (sockets.client.bridgeId = ids.daemon);
+  sockets.daemon && (sockets.daemon.bridgeId = ids.client);
 }
 
 function onClientConnect(socket) {
