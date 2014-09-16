@@ -18,6 +18,9 @@ function Bridge(io) {
   this.client = io.of(CLIENT_NSP);
   this.daemon = io.of(DAEMON_NSP);
 
+  this.client.bridge = this;
+  this.daemon.bridge = this;
+
   this.client.on('connection', onClientConnect);
   this.daemon.on('connection', onDaemonConnect);
 
@@ -44,6 +47,7 @@ Bridge.prototype.remove = function(ids) {
 
 // support array argument
 Bridge.prototype.getSockets = function(ids) {
+  ids = _.defaults(ids || {}, {client: '', daemon: ''});
   return {
     client : this.client.connected[ids.client],
     daemon : this.daemon.connected[ids.daemon]
@@ -57,6 +61,7 @@ function setBridgeId(sockets, ids) {
 }
 
 function onClientConnect(socket) {
+  var self   = this.bridge;
   var daemon = this.server.of(DAEMON_NSP);
   debug_c('connected : ' + socket.id);
   socket.on('bc-host', function(data) {
@@ -73,10 +78,12 @@ function onClientConnect(socket) {
   });
   socket.on('disconnect', function() {
     debug_c('disconnected : ' + socket.id);
+    self.remove({client: socket.id});
   });
 }
 
 function onDaemonConnect(socket) {
+  var self   = this.bridge;
   var client = this.server.of(CLIENT_NSP);
   debug_d('connected : ' + socket.id);
   socket.on('bd-data', function(data) {
@@ -95,5 +102,6 @@ function onDaemonConnect(socket) {
   });
   socket.on('disconnect', function() {
     debug_d('disconnected : ' + socket.id);
+    self.remove({daemon: socket.id});
   });
 }
