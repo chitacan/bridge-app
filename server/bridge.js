@@ -123,6 +123,7 @@ function onClientConnect(socket) {
   socket.on('disconnect', function() {
     debug_c('disconnected : ' + socket.id);
     bridge.remove({client: socket.id});
+    this.transmit = 0;
   });
 }
 
@@ -153,5 +154,6 @@ function onDaemonConnect(socket) {
     if (this.bridgeId)
       client.to(this.bridgeId).emit('bs-collapse');
     bridge.remove({daemon: socket.id});
+    this.transmit = 0;
   });
 }
