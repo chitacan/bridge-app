@@ -6,8 +6,10 @@ block content
     ul
       li(ng-repeat='bridge in bridges')
         div
-          p daemon id : {{ bridge.daemon }}
-          p client id : {{ bridge.client }}
+          p daemon : {{ bridge.daemon.host }} ({{ bridge.daemon.id }})
+          p client : {{ bridge.client.host }} ({{ bridge.client.id }})
+          p adb client : {{ bridge.client.connected }}
           p transmit : {{ bridge.transmit }}
+          button Delete this bridge
 block script
   script(src='/static/javascripts/index.js')

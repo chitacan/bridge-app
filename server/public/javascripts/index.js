@@ -2,7 +2,7 @@ var app = angular.module('bridge-manager', ['ngResource'])
 
 app.controller('statusCtrl', ['$scope', 'bridge', function($scope, bridge) {
   bridge.query().$promise.then(function(bridges) {
-    console.log(bridges);
+    $scope.bridges = bridges;
   });
 }]);
 
