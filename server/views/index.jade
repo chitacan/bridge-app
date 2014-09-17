@@ -9,7 +9,7 @@ block content
           p daemon : {{ bridge.daemon.host }} ({{ bridge.daemon.id }})
           p client : {{ bridge.client.host }} ({{ bridge.client.id }})
           p adb client : {{ bridge.client.connected }}
-          p transmit : {{ bridge.transmit }}
-          button Delete this bridge
+          p transmit : {{ bridge.transmit }} bytes
+          button(ng-click='remove(bridge.client.id, bridge.daemon.id)')  Remote this bridge
 block script
   script(src='/static/javascripts/index.js')

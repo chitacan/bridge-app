@@ -48,7 +48,8 @@ Bridge.prototype.get = function() {
 
     return {
       client : client,
-      daemon : daemon
+      daemon : daemon,
+      transmit : sktc.transmit + sktd.transmit
     }
   });
 }
@@ -93,6 +94,7 @@ function onClientConnect(socket) {
   var daemon = this.server.of(DAEMON_NSP);
   debug_c('connected : ' + socket.id);
   socket.clientConnected = false;
+  socket.transmit = 0;
   socket.on('bc-host', function(data) {
     data.toString = function() {
       return this.type
@@ -103,6 +105,7 @@ function onClientConnect(socket) {
     this.hostInfo = data;
   });
   socket.on('bc-data', function(data) {
+    this.transmit += data.binary.length;
     if (this.bridgeId)
       daemon.to(this.bridgeId).emit('bs-data', data);
     else {
@@ -127,7 +130,9 @@ function onDaemonConnect(socket) {
   var bridge = this.bridge;
   var client = this.server.of(CLIENT_NSP);
   debug_d('connected : ' + socket.id);
+  socket.transmit = 0;
   socket.on('bd-data', function(data) {
+    this.transmit += data.binary.length;
     if (this.bridgeId)
       client.to(this.bridgeId).emit('bs-data', data);
   });
