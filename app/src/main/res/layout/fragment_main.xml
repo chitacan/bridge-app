@@ -44,12 +44,11 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/edit_local_port"
         android:layout_toRightOf="@+id/edit_remote_addr"
-        android:hint="remote port"
+        android:hint="80"
         android:inputType="number"
         android:maxLength="5"
         android:minWidth="10sp"
-        android:singleLine="true"
-        android:text="80" />
+        android:singleLine="true" />
 
     <Button
         android:id="@+id/btn_start"

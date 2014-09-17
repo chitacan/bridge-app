@@ -120,12 +120,14 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
     private void startBridge() {
         String localPort  = mLocalPort.getText().toString();
         String remoteHost = mRemoteHost.getText().toString();
-        String remotePort = mRemotePort.getText().toString();
 
-        if (remoteHost.isEmpty() || localPort.isEmpty() || remotePort.isEmpty()) {
+        if (remoteHost.isEmpty() || localPort.isEmpty()) {
             Toast.makeText(getActivity(), "no host name or port number", Toast.LENGTH_LONG).show();
             return;
         }
+
+        String remotePort = mRemotePort.getText().toString();
+        remotePort = remotePort.isEmpty() ? "80" : remotePort;
 
         if (mServer == null) {
             try {
