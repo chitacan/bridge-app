@@ -2,44 +2,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity$PlaceholderFragment">
 
     <TextView
         android:id="@+id/section_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="status"/>
+        android:text="status" />
 
     <EditText
+        android:id="@+id/edit_local_port"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/section_status"
+        android:hint="local port number"
         android:inputType="number"
         android:maxLength="5"
-        android:id="@+id/edit_local_port"
-        android:layout_below="@+id/section_status"
-        android:text="6666"
-        android:hint="local port number"
-        android:layout_alignParentStart="true" />
+        android:text="6666" />
+
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textUri"
-        android:singleLine="true"
         android:id="@+id/edit_remote_addr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/edit_local_port"
-        android:text="chitacan.redribbon.io"
         android:hint="remote hostname"
-        android:layout_alignParentStart="true" />
+        android:inputType="textUri"
+        android:maxWidth="240dip"
+        android:singleLine="true"
+        android:text="chitacan.redribbon.io" />
+
+    <EditText
+        android:id="@+id/edit_remote_port"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/edit_local_port"
+        android:layout_toRightOf="@+id/edit_remote_addr"
+        android:hint="remote port"
+        android:inputType="number"
+        android:maxLength="5"
+        android:minWidth="10sp"
+        android:singleLine="true"
+        android:text="80" />
 
     <Button
         android:id="@+id/btn_start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edit_remote_addr"
+        android:layout_below="@id/edit_remote_port"
         android:text="start" />
 
     <Button

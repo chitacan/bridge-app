@@ -6,7 +6,6 @@ package com.chitacan.bridge;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,17 +16,16 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
@@ -47,8 +45,9 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
 
     private TextView mStatus     = null;
 
-    private EditText mLocalPortNumber  = null;
-    private EditText mHost = null;
+    private EditText mLocalPort  = null;
+    private EditText mRemoteHost = null;
+    private EditText mRemotePort = null;
 
     private Handler mHandler = new Handler() {
 
@@ -86,8 +85,9 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
         rootView.findViewById(R.id.btn_start).setOnClickListener(this);
         rootView.findViewById(R.id.btn_stop) .setOnClickListener(this);
         mStatus = (TextView) rootView.findViewById(R.id.section_status);
-        mHost = (EditText) rootView.findViewById(R.id.edit_remote_addr);
-        mLocalPortNumber  = (EditText) rootView.findViewById(R.id.edit_local_port);
+        mLocalPort = (EditText) rootView.findViewById(R.id.edit_local_port);
+        mRemoteHost = (EditText) rootView.findViewById(R.id.edit_remote_addr);
+        mRemotePort = (EditText) rootView.findViewById(R.id.edit_remote_port);
         return rootView;
     }
 
@@ -118,24 +118,30 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
     }
 
     private void startBridge() {
-        String host      = mHost.getText().toString();
-        String localPort = mLocalPortNumber.getText().toString();
+        String localPort  = mLocalPort.getText().toString();
+        String remoteHost = mRemoteHost.getText().toString();
+        String remotePort = mRemotePort.getText().toString();
 
-        if (host.length() == 0 || localPort.length() == 0) {
+        if (remoteHost.isEmpty() || localPort.isEmpty() || remotePort.isEmpty()) {
             Toast.makeText(getActivity(), "no host name or port number", Toast.LENGTH_LONG).show();
             return;
         }
 
         if (mServer == null) {
-            Uri.Builder builder = new Uri.Builder();
-            builder
-                    .scheme("http")
-                    .authority(mHost.getText().toString())
-                    .appendPath("bridge")
-                    .appendPath("daemon");
-
-            mServer = new ServerBridge(builder.toString());
-            mServer.setHandler(mHandler);
+            try {
+                URL url = new URL(
+                        "http",
+                        remoteHost,
+                        Integer.parseInt(remotePort),
+                        "bridge/daemon"
+                );
+                mServer = new ServerBridge(url.toString());
+                mServer.setHandler(mHandler);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                mStatus.setText("remote host malformed...");
+                return;
+            }
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
@@ -209,6 +215,7 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
                 @Override
                 public void call(Object... args) {
                     Exception e = (Exception) args[0];
+                    e.printStackTrace();
                     setStatus("server connect error - " + e.getMessage());
                 }
 
