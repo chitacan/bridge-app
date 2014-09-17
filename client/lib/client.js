@@ -25,6 +25,7 @@ Client.prototype.createServer = function() {
   var server = net.createServer(function(c) {
     server.socket = c;
     debug_a('connected');
+    self.socket.emit('bc-client-connected');
     c.on('close', function() {
       debug_a('disconnected');
       if (!!self.socket && self.socket.connected)
@@ -70,6 +71,10 @@ Client.prototype.createSocket = function() {
         daemon: daemonId
       });
     }
+  });
+  socket.on('bs-collapse', function() {
+    self.server.socket.end();
+    self.server.socket.destroy();
   });
   socket.on('data', function(data){
     debug_c('client data');
