@@ -30,7 +30,27 @@ function Bridge(io) {
 }
 
 Bridge.prototype.get = function() {
-  return this.bridges;
+  var self = this;
+  return _.map(self.bridges, function(ids) {
+    var skt = self.getSockets(ids);
+    var sktc = skt.client;
+    var sktd = skt.daemon;
+
+    var client = {
+      id        : sktc.id,
+      connected : sktc.clientConnected,
+      host      : sktc.hostInfo.hostname
+    }
+    var daemon = {
+      id   : sktd.id,
+      host : sktd.hostInfo.model + ' ' + sktd.hostInfo.version
+    }
+
+    return {
+      client : client,
+      daemon : daemon
+    }
+  });
 }
 
 Bridge.prototype.install = function(ids) {
