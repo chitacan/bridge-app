@@ -11,5 +11,6 @@ block content
           p adb client : {{ bridge.client.connected }}
           p transmit : {{ bridge.transmit }} bytes
           button(ng-click='remove(bridge.client.id, bridge.daemon.id)')  Remote this bridge
+    p(ng-show='bridges.length == 0') No bridges :(
 block script
   script(src='/static/javascripts/index.js')
