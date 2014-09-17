@@ -18,7 +18,7 @@ r.route('/bridge')
       client : req.param('client'),
       daemon : req.param('daemon')
     });
-    res.json({ result: 'removed' });
+    res.json(r.bridge.get());
   });
 
 r.route('/bridge/client')
