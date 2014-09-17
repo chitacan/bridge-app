@@ -1,6 +1,13 @@
 extends layout
 
 block content
-  h1 #{title}
+  div(ng-app='bridge-manager', ng-controller='statusCtrl')
+    h1 #{title}
+    ul
+      li(ng-repeat='bridge in bridges')
+        div
+          p daemon id : {{ bridge.daemon }}
+          p client id : {{ bridge.client }}
+          p transmit : {{ bridge.transmit }}
 block script
   script(src='/static/javascripts/index.js')
