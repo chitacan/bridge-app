@@ -92,6 +92,7 @@ function onClientConnect(socket) {
   var bridge = this.bridge;
   var daemon = this.server.of(DAEMON_NSP);
   debug_c('connected : ' + socket.id);
+  socket.clientConnected = false;
   socket.on('bc-host', function(data) {
     data.toString = function() {
       return this.type
@@ -109,7 +110,11 @@ function onClientConnect(socket) {
       cmd === 'CNXN' && (bridge.cache = data);
     }
   });
+  socket.on('bc-client-connected', function() {
+    socket.clientConnected = true;
+  });
   socket.on('bc-collapse', function() {
+    socket.clientConnected = false;
     bridge.remove({client: socket.id});
   });
   socket.on('disconnect', function() {
@@ -140,6 +145,8 @@ function onDaemonConnect(socket) {
   });
   socket.on('disconnect', function() {
     debug_d('disconnected : ' + socket.id);
+    if (this.bridgeId)
+      client.to(this.bridgeId).emit('bs-collapse');
     bridge.remove({daemon: socket.id});
   });
 }
