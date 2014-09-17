@@ -130,20 +130,8 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
         remotePort = remotePort.isEmpty() ? "80" : remotePort;
 
         if (mServer == null) {
-            try {
-                URL url = new URL(
-                        "http",
-                        remoteHost,
-                        Integer.parseInt(remotePort),
-                        "bridge/daemon"
-                );
-                mServer = new ServerBridge(url.toString());
-                mServer.setHandler(mHandler);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                mStatus.setText("remote host malformed...");
-                return;
-            }
+            mServer = new ServerBridge();
+            mServer.setHandler(mHandler);
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
@@ -153,9 +141,24 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             mDaemon.start();
         }
         mServer.setDaemon(mDaemon);
-        mServer.connect();
+        mServer.connect(createUrl(remoteHost, Integer.parseInt(remotePort)));
 
         mStatus.setText("connecting...");
+    }
+
+    private String createUrl(String host, int port) {
+        try {
+            URL url = new URL(
+                    "http",
+                    host,
+                    port,
+                    "bridge/daemon"
+            );
+            return url.toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     class ServerBridge {
@@ -167,19 +170,15 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
 
-        public ServerBridge(String url) {
-            mUrl = url;
-
+        public ServerBridge() {
             mOpt.forceNew             = true;
             mOpt.reconnectionDelay    = 10 * 1000;
             mOpt.reconnectionDelayMax = 20 * 1000;
-
-            createSocket();
         }
 
-        private void createSocket() {
+        private void createSocket(String url) {
             try {
-                mSocket = IO.socket(mUrl, mOpt);
+                mSocket = IO.socket(url, mOpt);
                 subscribe();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -256,11 +255,12 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             mSocket.emit(event, args);
         }
 
-        public Socket connect() {
+        public Socket connect(String url) {
             if (mSocket != null) {
                 disconnect();
-                createSocket();
             }
+            mUrl = url;
+            createSocket(url);
             return mSocket.connect();
         }
 
