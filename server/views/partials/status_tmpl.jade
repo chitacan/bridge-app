@@ -1,0 +1,10 @@
+button(ng-click='createBridge()') Create bridge
+ul
+  li(ng-repeat='bridge in bridges')
+    div
+      p daemon : {{ bridge.daemon.host }} ({{ bridge.daemon.id }})
+        p client : {{ bridge.client.host }} ({{ bridge.client.id }})
+        p adb client : {{ bridge.client.connected }}
+        p transmit : {{ bridge.transmit }} bytes
+        button(ng-click='remove(bridge.client.id, bridge.daemon.id)')  Remove
+p(ng-show='bridges.length == 0') No bridges :(

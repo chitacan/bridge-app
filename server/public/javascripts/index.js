@@ -1,28 +1,55 @@
-var app = angular.module('bridge-manager', ['ngResource'])
+var app = angular.module('bridge-manager', ['ngResource', 'ngRoute'])
 
-app.controller('statusCtrl', ['$scope', 'bridge', function($scope, bridge) {
+app.config(function($routeProvider, $locationProvider) {
+  $routeProvider
+  .when('/', {
+    templateUrl: 'partials/status_tmpl',
+    controller : 'statusCtrl'
+  })
+  .when('/create', {
+    templateUrl: 'partials/create_tmpl',
+    controller : 'createCtrl'
+  });
+});
+
+app.controller('statusCtrl', function($scope, Bridge, $location) {
   $scope.remove = function(client, daemon) {
-    bridge.remove({
+    Bridge.remove({
       client: client,
       daemon: daemon
     }).$promise.then(function(bridges) {
       $scope.bridges = bridges;
     });
   }
-  bridge.query().$promise.then(function(bridges) {
+  $scope.createBridge = function() {
+    $location.path('/create');
+  }
+  Bridge.query().$promise.then(function(bridges) {
     $scope.bridges = bridges;
   });
-}]);
+});
 
-app.factory('bridge', function($resource) {
+app.controller('createCtrl', function($scope, Bridge, $location, $q) {
+  $q.all({
+    daemon: Bridge.daemon().$promise,
+    client: Bridge.client().$promise
+  }).then(function(res) {
+    $scope.client = res.client;
+    $scope.daemon = res.daemon;
+  })
+});
+
+app.factory('Bridge', function($resource) {
   return $resource(
-    '/api/bridge',
+    '/api/bridge/:type',
     {},
     {
       'query'  : { method: 'GET', isArray: true },
       'get'    : { method: 'GET' },
       'create' : { method: 'PUT' },
-      'remove' : { method: 'DELETE', isArray: true }
+      'remove' : { method: 'DELETE', isArray: true },
+      'client' : { method: 'GET', isArray: true, params: {type: 'client'} },
+      'daemon' : { method: 'GET', isArray: true, params: {type: 'daemon'} }
     }
   )
 });

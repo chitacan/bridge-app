@@ -3,14 +3,6 @@ extends layout
 block content
   div(ng-app='bridge-manager', ng-controller='statusCtrl')
     h1 #{title}
-    ul
-      li(ng-repeat='bridge in bridges')
-        div
-          p daemon : {{ bridge.daemon.host }} ({{ bridge.daemon.id }})
-          p client : {{ bridge.client.host }} ({{ bridge.client.id }})
-          p adb client : {{ bridge.client.connected }}
-          p transmit : {{ bridge.transmit }} bytes
-          button(ng-click='remove(bridge.client.id, bridge.daemon.id)')  Remote this bridge
-    p(ng-show='bridges.length == 0') No bridges :(
+    div(ng-view)
 block script
   script(src='/static/javascripts/index.js')
