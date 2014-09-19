@@ -39,6 +39,7 @@ function getSocketInfo(namespace) {
   return _(sockets)
   .reject('bridgeId')
   .map(function(val) {
+    var host = !!val.hostInfo ? val.hostInfo.toString() : 'unknown';
     return {
       name  : val.hostInfo.toString(),
       value : val.id
