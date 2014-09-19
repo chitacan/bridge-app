@@ -1,9 +1,16 @@
-button(ng-click='') Create
+button(ng-click='createBridge(selected)', ng-disabled='clientForm.$pristine || daemonForm.$pristine') Create
 p Client
-ul
-  li(ng-repeat='c in client')
-    p {{ c.name }}
+form(name='clientForm')
+  div(ng-repeat='c in client')
+    label
+      input(type='radio', value='{{ c.value }}', ng-model='selected.client')
+      | {{ c.name }}
+    br
+
 p Daemon
-ul
-  li(ng-repeat='d in daemon')
-    p {{ d.name }}
+form(name='daemonForm')
+  div(ng-repeat='d in daemon')
+    label
+      input(type='radio', value='{{ d.value }}', ng-model='selected.daemon')
+      | {{ d.name }}
+    br

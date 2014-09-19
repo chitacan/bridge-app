@@ -30,6 +30,7 @@ app.controller('statusCtrl', function($scope, Bridge, $location) {
 });
 
 app.controller('createCtrl', function($scope, Bridge, $location, $q) {
+  $scope.selected = {};
   $q.all({
     daemon: Bridge.daemon().$promise,
     client: Bridge.client().$promise
@@ -37,6 +38,11 @@ app.controller('createCtrl', function($scope, Bridge, $location, $q) {
     $scope.client = res.client;
     $scope.daemon = res.daemon;
   })
+  $scope.createBridge = function(selected) {
+    Bridge.create(selected).$promise.then(function(res) {
+      $location.path('/');
+    });
+  }
 });
 
 app.factory('Bridge', function($resource) {
