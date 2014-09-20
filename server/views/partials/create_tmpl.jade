@@ -6,6 +6,7 @@ form(name='clientForm')
       input(type='radio', value='{{ c.value }}', ng-model='selected.client')
       | {{ c.name }}
     br
+  li(ng-show='client.length == 0') No client connection
 
 p Daemon
 form(name='daemonForm')
@@ -14,3 +15,4 @@ form(name='daemonForm')
       input(type='radio', value='{{ d.value }}', ng-model='selected.daemon')
       | {{ d.name }}
     br
+  li(ng-show='daemon.length == 0') No daemon connection
