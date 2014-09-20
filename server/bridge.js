@@ -70,6 +70,7 @@ Bridge.prototype.remove = function(ids) {
     return (ids.client === val.client) || (ids.daemon === val.daemon);
   });
   var skt = this.getSockets(removed[0]);
+  skt.client && skt.client.emit('bs-collapse');
   setBridgeId(skt);
   this.cache = '';
 }
