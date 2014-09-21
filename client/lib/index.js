@@ -14,6 +14,10 @@ var defaultChoices = [
   {
     name  : 'Connect without daemon',
     value : 0
+  },
+  {
+    name  : 'Get me out of here!',
+    value : -1
   }
 ];
 
@@ -31,7 +35,7 @@ function request(cb) {
   .on('timeout', exit);
 }
 
-function handleResponse(choices) {
+function onResponse(choices) {
   inquirer.prompt([
                   {
     type    : 'list',
@@ -39,22 +43,31 @@ function handleResponse(choices) {
     message : 'Select connected daemon ID',
     choices : choices
   }
-  ], runClient);
+  ], onSelect);
 }
 
-function runClient(answer) {
-  if (typeof answer.daemonId == 'string')
-    option.daemonId = answer.daemonId;
-  client(option);
+function onSelect(answer) {
+  switch(answer.daemonId) {
+    case -1:
+      exit();
+      return;
+    case 0:
+    default:
+      if (typeof answer.daemonId == 'string')
+        option.daemonId = answer.daemonId;
+      client(option);
+      break;
+  }
 }
 
 function exit() {
-  debug_e('Server not responding...');
+  if (arguments.length > 0)
+    debug_e('Sever not responding...');
   process.exit(0);
 }
 
 module.exports = function(opt) {
   option = opt;
-  request(handleResponse);
+  request(onResponse);
 }
 
