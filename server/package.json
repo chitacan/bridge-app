@@ -6,7 +6,7 @@
   "scripts": {
     "start": "DEBUG=express:application,server:* node ./bin/www",
     "debug": "DEBUG=express:application,server:* node --debug-brk ./bin/www",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node node_modules/mocha/bin/mocha -R nyan",
     "postinstall": "bower install"
   },
   "repository": {
@@ -34,6 +34,9 @@
     "underscore": "^1.6.0"
   },
   "devDependencies": {
-    "longjohn": "^0.2.4"
+    "longjohn": "^0.2.4",
+    "mocha": "^1.21.4",
+    "should": "^4.0.4",
+    "supertest": "^0.13.0"
   }
 }
