@@ -2,12 +2,14 @@ var client   = require('./client')
   , inquirer = require('inquirer')
   , rest     = require('restler')
   , u        = require('url')
+  , rl       = require('readline')
   , debug    = require('debug')
   , debug_e  = debug('client:error');
 
 debug_e.log = console.error.bind(console);
 
 var option;
+var p;
 
 var defaultChoices = [
   new inquirer.Separator(),
@@ -16,8 +18,12 @@ var defaultChoices = [
     value : 0
   },
   {
-    name  : 'Get me out of here!',
+    name  : 'Refresh',
     value : -1
+  },
+  {
+    name  : 'Get me out of here!',
+    value : -2
   }
 ];
 
@@ -36,7 +42,7 @@ function request(cb) {
 }
 
 function onResponse(choices) {
-  inquirer.prompt([
+  p = inquirer.prompt([
                   {
     type    : 'list',
     name    : 'daemonId',
@@ -49,6 +55,10 @@ function onResponse(choices) {
 function onSelect(answer) {
   switch(answer.daemonId) {
     case -1:
+      clearUpperLine();
+      request(onResponse);
+      return;
+    case -2:
       exit();
       return;
     case 0:
@@ -58,6 +68,11 @@ function onSelect(answer) {
       client(option);
       break;
   }
+}
+
+function clearUpperLine() {
+  rl.moveCursor(process.stdout, 0, -1);
+  rl.clearLine (process.stdout, 0);
 }
 
 function exit() {
