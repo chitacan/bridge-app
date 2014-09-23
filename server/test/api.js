@@ -14,29 +14,91 @@ describe('Bridge API', function(){
     return this.bridge;
   }
   MockBridge.prototype.install = function(ids) {
-    this.bridges.push(ids)
+    this.bridge.push(ids)
   }
   MockBridge.prototype.remove = function(ids) {
-    return this.bridges.pop();
+    this.bridge.pop();
   }
-  MockBridge.prototype.getSocketByNsp = function() {
-    return [{
-      name  : '',
-      value : ''
-    }]
+  MockBridge.prototype.getSocketByNsp = function(nsp) {
+    var sockets = {
+      '/bridge/client': [{ name  : 'client-host', value : 'client-id' }],
+      '/bridge/daemon': [{ name  : 'daemon-host', value : 'daemon-id' }]
+    }
+    return sockets[nsp];
   }
 
   var app = require('../app')({bridge: MockBridge}).app;
 
-  describe('/api/bridge', function(){
+  describe('/api/bridge', function() {
 
-    it('GET should response bridges', function(done){
+    it('PUT should response "created"', function(done){
+      request(app)
+      .put('/api/bridge')
+      .send({
+        client: 'client-id',
+        daemon: 'daemon-id'
+      })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
+        (res.body).should.eql({ result: 'created' });
+        done();
+      });
+    });
+
+    it('GET should response bridge info', function(done){
       request(app)
       .get('/api/bridge')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200, function(err, res) {
         should.not.exist(err);
+        (res.body).should.eql( [{ client: 'client-id', daemon: 'daemon-id' }] );
+        done();
+      });
+    });
+
+    it('DELETE should response ', function(done){
+      request(app)
+      .delete('/api/bridge')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
+        (res.body).should.eql( [] );
+        done();
+      });
+    });
+
+  });
+
+  describe('/api/bridge/client', function(){
+
+    it('GET should response connected client', function(done){
+      request(app)
+      .get('/api/bridge/client')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
+        (res.body).should.eql( [{ name: 'client-host', value: 'client-id' }] );
+        done();
+      });
+    });
+
+  });
+
+  describe('/api/bridge/daemon', function(){
+
+    it('GET should response connected daemon', function(done){
+      request(app)
+      .get('/api/bridge/daemon')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
+        (res.body).should.eql( [{ name: 'daemon-host', value: 'daemon-id' }] );
         done();
       });
     });
