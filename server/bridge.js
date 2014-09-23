@@ -32,7 +32,7 @@ function Bridge(io) {
 Bridge.prototype.get = function() {
   var self = this;
   return _.map(self.bridges, function(ids) {
-    var skt = self.getSockets(ids);
+    var skt = self.getSocketById(ids);
     var sktc = skt.client;
     var sktd = skt.daemon;
 
@@ -56,7 +56,7 @@ Bridge.prototype.get = function() {
 
 Bridge.prototype.install = function(ids) {
   this.bridges.push(ids);
-  var skt = this.getSockets(ids);
+  var skt = this.getSocketById(ids);
   setBridgeId(skt, ids);
 
   if (skt.daemon && this.cache) {
@@ -69,14 +69,14 @@ Bridge.prototype.remove = function(ids) {
   var removed = _.remove(this.bridges, function(val) {
     return (ids.client === val.client) || (ids.daemon === val.daemon);
   });
-  var skt = this.getSockets(removed[0]);
+  var skt = this.getSocketById(removed[0]);
   skt.client && skt.client.emit('bs-collapse');
   setBridgeId(skt);
   this.cache = '';
 }
 
 // support array argument
-Bridge.prototype.getSockets = function(ids) {
+Bridge.prototype.getSocketById = function(ids) {
   ids = _.defaults(ids || {}, {client: '', daemon: ''});
   return {
     client : this.client.connected[ids.client],
