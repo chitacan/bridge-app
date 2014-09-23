@@ -1,4 +1,6 @@
 'use strict'
+delete require.cache[require.resolve('../routes/api')]
+
 var request = require('supertest')
   , should  = require('should')
 
@@ -99,6 +101,40 @@ describe('Bridge API', function(){
       .expect(200, function(err, res) {
         should.not.exist(err);
         (res.body).should.eql( [{ name: 'daemon-host', value: 'daemon-id' }] );
+        done();
+      });
+    });
+
+  });
+
+  describe('Page routes', function(){
+
+    it('should response index page', function(done){
+      request(app)
+      .get('/')
+      .expect('Content-Type', /text\/html/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
+    it('should response status partial page', function(done){
+      request(app)
+      .get('/partials/status_tmpl')
+      .expect('Content-Type', /text\/html/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
+        done();
+      });
+    });
+
+    it('should response create partial page', function(done){
+      request(app)
+      .get('/partials/create_tmpl')
+      .expect('Content-Type', /text\/html/)
+      .expect(200, function(err, res) {
+        should.not.exist(err);
         done();
       });
     });
