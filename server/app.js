@@ -4,6 +4,8 @@ var express      = require('express')
   , logger       = require('morgan')
   , cookieParser = require('cookie-parser')
   , bodyParser   = require('body-parser')
+  , debug        = require('debug')('server:app')
+
 
 module.exports = create;
 
@@ -20,7 +22,8 @@ function create(dep) {
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
 
-  app.use(logger('dev'));
+  if (debug.enabled)
+    app.use(logger('dev'));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
