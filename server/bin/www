@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-var debug = require('debug')('server:excute')
-  , www   = require('../app')();
+var debug = require('debug')('server:www')
+  , www   = require('../app')({});
 
 var app    = www.app
   , server = www.server;
