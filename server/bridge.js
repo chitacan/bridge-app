@@ -84,6 +84,21 @@ Bridge.prototype.getSocketById = function(ids) {
   }
 }
 
+Bridge.prototype.getSocketByNsp = function(namespace) {
+  var nsp     = this.io.of(namespace)
+  var sockets = _.values(nsp.connected);
+  return _(sockets)
+  .reject('bridgeId')
+  .map(function(val) {
+    var host = !!val.hostInfo ? val.hostInfo.toString() : 'unknown';
+    return {
+      name  : val.hostInfo.toString(),
+      value : val.id
+    }
+  })
+  .valueOf();
+}
+
 function setBridgeId(sockets, ids) {
   ids = _.defaults(ids || {}, {client: '', daemon: ''});
   sockets.client && (sockets.client.bridgeId = ids.daemon);

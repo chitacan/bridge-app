@@ -23,30 +23,15 @@ r.route('/bridge')
 
 r.route('/bridge/client')
   .get(function(req, res) {
-    var ids = getSocketInfo('/bridge/client')
+    var ids = r.bridge.getSocketByNsp('/bridge/client')
     res.json(ids);
   });
 
 r.route('/bridge/daemon')
   .get(function(req, res) {
-    var ids = getSocketInfo('/bridge/daemon')
+    var ids = r.bridge.getSocketByNsp('/bridge/daemon')
     res.json(ids);
   });
-
-function getSocketInfo(namespace) {
-  var nsps = r.bridge.io.of(namespace)
-  var sockets = _.values(nsps.connected);
-  return _(sockets)
-  .reject('bridgeId')
-  .map(function(val) {
-    var host = !!val.hostInfo ? val.hostInfo.toString() : 'unknown';
-    return {
-      name  : val.hostInfo.toString(),
-      value : val.id
-    }
-  })
-  .valueOf();
-}
 
 module.exports = function(bridge) {
   r.bridge = bridge;
