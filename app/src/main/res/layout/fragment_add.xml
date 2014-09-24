@@ -6,44 +6,35 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity$PlaceholderFragment">
-
-    <TextView
-        android:id="@+id/section_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="status" />
+    tools:context="com.chitacan.bridge.AddFragment">
 
     <EditText
-        android:id="@+id/edit_local_port"
+        android:id="@+id/edit_server_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/section_status"
-        android:hint="local port number"
-        android:inputType="number"
-        android:maxLength="5"
-        android:text="6666" />
+        android:hint="Server Name"
+        android:inputType="textUri"
+        android:singleLine="true" />
 
     <EditText
-        android:id="@+id/edit_remote_addr"
+        android:id="@+id/edit_server_url"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/edit_local_port"
-        android:hint="remote hostname"
+        android:hint="Server URL"
+        android:layout_below="@+id/edit_server_name"
         android:inputType="textUri"
         android:minWidth="240dip"
-        android:singleLine="true"
-        android:text="chitacan.redribbon.io" />
+        android:singleLine="true" />
 
     <EditText
         android:id="@+id/edit_remote_port"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/edit_local_port"
-        android:layout_toRightOf="@+id/edit_remote_addr"
+        android:layout_below="@+id/edit_server_name"
+        android:layout_toRightOf="@+id/edit_server_url"
         android:hint="80"
         android:inputType="number"
         android:maxLength="5"
@@ -55,13 +46,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/edit_remote_port"
-        android:text="start" />
-
-    <Button
-        android:id="@+id/btn_stop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_start"
-        android:text="stop" />
+        android:text="Add" />
 
 </RelativeLayout>
