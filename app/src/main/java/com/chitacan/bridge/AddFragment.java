@@ -122,7 +122,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         switch(v.getId()) {
             case R.id.btn_add:
                 addServer();
-                clearInput();
+                getFragmentManager().popBackStack();
                 break;
         }
     }
@@ -140,12 +140,6 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         values.put(ServerProvider.SERVER_PORT, p);
 
         Uri uri = getActivity().getContentResolver().insert(ServerProvider.CONTENT_URI, values);
-    }
-
-    private void clearInput() {
-        mServerName.setText("");
-        mServerUrl .setText("");
-        mServerPort.setText("");
     }
 
     /**
