@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,6 +70,7 @@ public class NavigationDrawerFragment
     private static final int SERVER_LIST_LOADER = 0;
 
 
+    private static final int COLUMN_IDX_Id   = 0;
     private static final int COLUMN_IDX_NAME = 1;
     private static final int COLUMN_IDX_PORT = 2;
     private static final int COLUMN_IDX_URL  = 3;
@@ -81,6 +83,8 @@ public class NavigationDrawerFragment
     };
 
     private ServerListAdapter mAdapter;
+
+    private ActionMode mActionMode;
 
     public NavigationDrawerFragment() {
     }
@@ -126,6 +130,19 @@ public class NavigationDrawerFragment
                 selectItem(position);
             }
         });
+        mDrawerListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mActionMode != null) {
+                    return false;
+                }
+
+                mActionMode = getActivity().startActionMode(mActionModeCallback);
+                mActionMode.setTag(getItem(position));
+                mDrawerListView.setItemChecked(position, true);
+                return true;
+            }
+        });
         mDrawerListView.setAdapter(mAdapter);
         return mDrawerListView;
     }
@@ -164,6 +181,9 @@ public class NavigationDrawerFragment
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
+                if (mActionMode != null)
+                    mActionMode.finish();
+                
                 if (!isAdded()) {
                     return;
                 }
@@ -217,13 +237,18 @@ public class NavigationDrawerFragment
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null && mAdapter != null) {
-            Cursor cursor = (Cursor) mAdapter.getItem(position);
-            Bundle bundle = new Bundle();
-            bundle.putString("name", cursor.getString(COLUMN_IDX_NAME));
-            bundle.putString("url",  cursor.getString(COLUMN_IDX_URL ));
-            bundle.putInt("port", cursor.getInt(COLUMN_IDX_PORT));
-            mCallbacks.onNavigationDrawerItemSelected(bundle);
+            mCallbacks.onNavigationDrawerItemSelected(getItem(position));
         }
+    }
+
+    private Bundle getItem(int position) {
+        Cursor cursor = (Cursor) mAdapter.getItem(position);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", cursor.getString(COLUMN_IDX_NAME));
+        bundle.putString("url",  cursor.getString(COLUMN_IDX_URL ));
+        bundle.putInt("port", cursor.getInt(COLUMN_IDX_PORT));
+        bundle.putInt("id", cursor.getInt(COLUMN_IDX_Id));
+        return bundle;
     }
 
     @Override
@@ -363,4 +388,43 @@ public class NavigationDrawerFragment
             url  .setText(cursor.getString(COLUMN_IDX_URL ));
         }
     }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.server_context, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_remove:
+                    Bundle bundle = (Bundle) mode.getTag();
+                    if (bundle != null) {
+                        getActivity().getContentResolver().delete(
+                                ServerProvider.CONTENT_URI,
+                                ServerProvider._ID + "=" + bundle.getInt("id"),
+                                null);
+                    }
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+        }
+    };
 }
