@@ -39,8 +39,8 @@ public class ServerProvider extends ContentProvider{
     static final UriMatcher uriMatcher;
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(PROVIDER_NAME, "servers",   SERVERS  );
-        uriMatcher.addURI(PROVIDER_NAME, "servers/#", SERVER_ID);
+        uriMatcher.addURI(PROVIDER_NAME, "server",   SERVERS  );
+        uriMatcher.addURI(PROVIDER_NAME, "server/#", SERVER_ID);
     }
 
     static final String DATABASE_NAME     = "bridge";
