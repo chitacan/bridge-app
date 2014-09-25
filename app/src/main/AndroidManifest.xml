@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <provider
-            android:authorities="com.chitacan.bridge.server"
+            android:authorities="com.chitacan.bridge"
             android:name=".ServerProvider"/>
     </application>
 
