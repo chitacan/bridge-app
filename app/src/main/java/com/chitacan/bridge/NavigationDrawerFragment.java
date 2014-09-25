@@ -1,16 +1,21 @@
 package com.chitacan.bridge;
 
 
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,8 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -27,7 +33,9 @@ import android.widget.Toast;
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-public class NavigationDrawerFragment extends Fragment {
+public class NavigationDrawerFragment
+        extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Remember the position of the selected item.
@@ -57,6 +65,22 @@ public class NavigationDrawerFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+
+    private static final int SERVER_LIST_LOADER = 0;
+
+
+    private static final int COLUMN_IDX_NAME = 1;
+    private static final int COLUMN_IDX_PORT = 2;
+    private static final int COLUMN_IDX_URL  = 3;
+
+    private static final String[] PROJECTION = {
+            ServerProvider._ID,
+            ServerProvider.SERVER_NAME,
+            ServerProvider.SERVER_PORT,
+            ServerProvider.SERVER_URL
+    };
+
+    private ServerListAdapter mAdapter;
 
     public NavigationDrawerFragment() {
     }
@@ -89,6 +113,11 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+
+        getLoaderManager().initLoader(SERVER_LIST_LOADER, null, this);
+
+        mAdapter = new ServerListAdapter(getActivity());
+
         mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -97,16 +126,7 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+        mDrawerListView.setAdapter(mAdapter);
         return mDrawerListView;
     }
 
@@ -213,6 +233,13 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onDetach() {
+
+        getLoaderManager().destroyLoader(SERVER_LIST_LOADER);
+        if (mAdapter != null) {
+            mAdapter.changeCursor(null);
+            mAdapter = null;
+        }
+
         super.onDetach();
         mCallbacks = null;
     }
@@ -278,5 +305,57 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch(id) {
+            case SERVER_LIST_LOADER:
+                return new CursorLoader(
+                        getActivity(),
+                        ServerProvider.CONTENT_URI,
+                        PROJECTION,
+                        null,
+                        null,
+                        null
+                );
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.changeCursor(null);
+    }
+
+    private class ServerListAdapter extends CursorAdapter {
+
+        public ServerListAdapter(Context context) {
+            super(context, null, false);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+
+            View v     = inflater.inflate(android.R.layout.simple_list_item_activated_1, null);
+            View title = v.findViewById(android.R.id.text1);
+            v.setTag(title);
+
+            return v;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView title = (TextView) view.getTag();
+            title.setText(cursor.getString(COLUMN_IDX_NAME));
+        }
     }
 }
