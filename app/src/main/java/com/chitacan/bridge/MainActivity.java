@@ -3,6 +3,7 @@ package com.chitacan.bridge;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -12,8 +13,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-                   AddFragment.OnFragmentInteractionListener,
-                   ClientFragment.OnFragmentInteractionListener {
+                   AddFragment.OnFragmentInteractionListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -48,11 +48,11 @@ public class MainActivity extends Activity
     @Override
     public void onNavigationDrawerItemSelected(Bundle bundle) {
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, ClientFragment.newInstance(bundle))
-                .addToBackStack(null)
-                .commit();
+        Intent intent = new Intent();
+        intent.setClass(this, ClientActivity.class);
+        intent.putExtras(bundle);
+
+        startActivity(intent);
     }
 
     public void onSectionAttached(int number) {
@@ -112,11 +112,6 @@ public class MainActivity extends Activity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onFragmentInteraction(String id) {
 
     }
 }

@@ -1,0 +1,25 @@
+package com.chitacan.bridge;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+
+
+public class ClientActivity extends Activity implements ClientFragment.OnFragmentInteractionListener {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_client);
+        if (savedInstanceState == null) {
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, ClientFragment.newInstance(getIntent().getExtras()))
+                    .commit();
+        }
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
+
+    }
+}

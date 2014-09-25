@@ -18,9 +18,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
-            android:authorities="com.chitacan.bridge"
-            android:name=".ServerProvider"/>
+            android:name=".ServerProvider"
+            android:authorities="com.chitacan.bridge" />
+
+        <activity
+            android:name=".ClientActivity"
+            android:label="@string/title_activity_client" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>

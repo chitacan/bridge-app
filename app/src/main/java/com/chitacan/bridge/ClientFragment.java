@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,10 +96,18 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.action_add);
-        if (item != null ) item.setVisible(false);
-
         super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(getActivity());
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -129,7 +138,12 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
     public void failure(RetrofitError error) {
         error.printStackTrace();
         Toast.makeText(getActivity(), "Rest API error", Toast.LENGTH_LONG).show();
-        getFragmentManager().popBackStack();
+        getListView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                NavUtils.navigateUpFromSameTask(getActivity());
+            }
+        }, 1500);
     }
 
     /**
