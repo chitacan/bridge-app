@@ -1,29 +1,41 @@
 package com.chitacan.bridge;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chitacan.bridge.dummy.DummyContent;
+
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * A fragment representing a list of Items.
  * <p />
  * <p />
  */
-public class ClientFragment extends ListFragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class ClientFragment extends ListFragment implements Callback<List<API.Client>> {
 
     private String mServerName;
     private String mServerUrl;
     private int mServerPort;
+    private ClientListAdapter mAdapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -51,9 +63,14 @@ public class ClientFragment extends ListFragment {
             mServerPort = getArguments().getInt("port");
         }
 
-        // TODO: Change Adapter to display your content
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS));
+        setHasOptionsMenu(true);
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(Util.createUrl(mServerUrl, mServerPort, null))
+                .build();
+
+        API.BridgeService service = restAdapter.create(API.BridgeService.class);
+        service.listClients(this);
     }
 
 
@@ -66,6 +83,22 @@ public class ClientFragment extends ListFragment {
             throw new ClassCastException(activity.toString()
                 + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        ActionBar actionbar = getActivity().getActionBar();
+        actionbar.setTitle(mServerName);
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_add);
+        if (item != null ) item.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -86,6 +119,19 @@ public class ClientFragment extends ListFragment {
         }
     }
 
+    @Override
+    public void success(List<API.Client> clients, Response response) {
+        mAdapter = new ClientListAdapter(getActivity(), clients);
+        setListAdapter(mAdapter);
+    }
+
+    @Override
+    public void failure(RetrofitError error) {
+        error.printStackTrace();
+        Toast.makeText(getActivity(), "Rest API error", Toast.LENGTH_LONG).show();
+        getFragmentManager().popBackStack();
+    }
+
     /**
     * This interface must be implemented by activities that contain this
     * fragment to allow an interaction in this fragment to be communicated
@@ -101,4 +147,24 @@ public class ClientFragment extends ListFragment {
         public void onFragmentInteraction(String id);
     }
 
+    private class ClientListAdapter extends ArrayAdapter<API.Client> {
+
+        public ClientListAdapter(Context context, List<API.Client> clients) {
+            super(context, 0, clients);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = LayoutInflater.from(getActivity()).inflate(android.R.layout.simple_list_item_2, null);
+
+            TextView name  = (TextView) v.findViewById(android.R.id.text1);
+            TextView value = (TextView) v.findViewById(android.R.id.text2);
+
+            API.Client client = getItem(position);
+            name .setText(client.name);
+            value.setText(client.value);
+
+            return v;
+        }
+    }
 }
