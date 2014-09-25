@@ -216,8 +216,13 @@ public class NavigationDrawerFragment
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+        if (mCallbacks != null && mAdapter != null) {
+            Cursor cursor = (Cursor) mAdapter.getItem(position);
+            Bundle bundle = new Bundle();
+            bundle.putString("name", cursor.getString(COLUMN_IDX_NAME));
+            bundle.putString("port", cursor.getString(COLUMN_IDX_PORT));
+            bundle.putString("url",  cursor.getString(COLUMN_IDX_URL ));
+            mCallbacks.onNavigationDrawerItemSelected(bundle);
         }
     }
 
@@ -304,7 +309,7 @@ public class NavigationDrawerFragment
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerItemSelected(Bundle bundle);
     }
 
 
