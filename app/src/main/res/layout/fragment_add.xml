@@ -29,7 +29,7 @@
         android:singleLine="true" />
 
     <EditText
-        android:id="@+id/edit_remote_port"
+        android:id="@+id/edit_server_port"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -42,10 +42,11 @@
         android:singleLine="true" />
 
     <Button
-        android:id="@+id/btn_start"
+        android:id="@+id/btn_add"
+        android:layout_marginTop="20dip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edit_remote_port"
+        android:layout_below="@id/edit_server_port"
         android:text="Add" />
 
 </RelativeLayout>
