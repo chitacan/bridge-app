@@ -46,30 +46,50 @@ describe('Socket.io API', function() {
     });
   });
 
-  it('Create birdge', function(done) {
-    rest.get('http://localhost:9500/api/bridge/client')
-    .on('2XX', function(ids) {
-      (ids).should.eql( [{
-        name  : 'type arch client-test ver',
-        value : client_socket.io.engine.id
-      }] );
+  it('Send client cache', function(done) {
+    client_socket.emit('bc-data', { binary: new Buffer('CNXN') });
+    done();
+  });
+
+  it('Create birdge & ensure client cache', function(done) {
+    rest.put('http://localhost:9500/api/bridge', {
+      data: {
+        client: client_socket.io.engine.id,
+        daemon: daemon_socket.io.engine.id
+      }
+    })
+    .on('2XX', function(res) {
+      res.should.eql({ result: 'created' });
+    });
+    daemon_socket.on('bs-data', function(data) {
+      daemon_socket.off('bs-data');
+      (data.binary.toString()).should.equal('CNXN');
       done();
     });
   });
 
-  it('Client >> Daemon', function(done) {
+  it('Client >> Daemon (bc-data)', function(done) {
+    var dummyData = { binary: [0,0] };
+    daemon_socket.on('bs-data', function(data) {
+      daemon_socket.off('bs-data');
+      data.should.eql(dummyData);
+      done();
+    });
+    client_socket.emit('bc-data', dummyData);
+  });
+
+  it('Daemon >> Client (bd-data)', function(done) {
+    var dummyData = { binary: [1,1] };
+    client_socket.on('bs-data', function(data) {
+      client_socket.off('bs-data');
+      data.should.eql(dummyData);
+      done();
+    });
+    daemon_socket.emit('bd-data', dummyData);
+  });
+
+  it('remove birdge', function(done) {
     done();
   });
 
-  it('Daemon >> Client', function(done) {
-    done();
-  });
-
-  it('Collpase birdge', function(done) {
-    done();
-  });
-
-  it('Client Cache', function(done) {
-    done();
-  });
 });
