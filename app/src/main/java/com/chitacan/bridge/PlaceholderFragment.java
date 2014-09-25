@@ -24,8 +24,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
@@ -141,24 +139,9 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
             mDaemon.start();
         }
         mServer.setDaemon(mDaemon);
-        mServer.connect(createUrl(remoteHost, Integer.parseInt(remotePort)));
+        mServer.connect(Util.createUrl(remoteHost, Integer.parseInt(remotePort), "bridge/daemon"));
 
         mStatus.setText("connecting...");
-    }
-
-    private String createUrl(String host, int port) {
-        try {
-            URL url = new URL(
-                    "http",
-                    host,
-                    port,
-                    "bridge/daemon"
-            );
-            return url.toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     class ServerBridge {
