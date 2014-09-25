@@ -345,17 +345,17 @@ public class NavigationDrawerFragment
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
 
-            View v     = inflater.inflate(android.R.layout.simple_list_item_activated_1, null);
-            View title = v.findViewById(android.R.id.text1);
-            v.setTag(title);
-
-            return v;
+            return inflater.inflate(android.R.layout.simple_list_item_activated_2, null);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            TextView title = (TextView) view.getTag();
+
+            TextView title = (TextView) view.findViewById(android.R.id.text1);
+            TextView url   = (TextView) view.findViewById(android.R.id.text2);
+
             title.setText(cursor.getString(COLUMN_IDX_NAME));
+            url  .setText(cursor.getString(COLUMN_IDX_URL ));
         }
     }
 }
