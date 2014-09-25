@@ -220,8 +220,8 @@ public class NavigationDrawerFragment
             Cursor cursor = (Cursor) mAdapter.getItem(position);
             Bundle bundle = new Bundle();
             bundle.putString("name", cursor.getString(COLUMN_IDX_NAME));
-            bundle.putString("port", cursor.getString(COLUMN_IDX_PORT));
             bundle.putString("url",  cursor.getString(COLUMN_IDX_URL ));
+            bundle.putInt("port", cursor.getInt(COLUMN_IDX_PORT));
             mCallbacks.onNavigationDrawerItemSelected(bundle);
         }
     }
