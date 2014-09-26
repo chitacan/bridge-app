@@ -13,21 +13,32 @@ import java.util.ArrayList;
 
 public class BridgeService extends Service {
 
+    static final int MSG_REGISTER_CLIENT   = 0;
+    static final int MSG_UNREGISTER_CLIENT = 1;
+    static final int MSG_CREATE_BRIDGE     = 2;
+    static final int MSG_REMOVE_BRIDGE     = 3;
+    static final int MSG_STATUS_BRIDGE     = 4;
+
     class IncomingHandler extends Handler {
 
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 0:
+                case MSG_REGISTER_CLIENT:
                     mClients.add(msg.replyTo);
                     Log.d("chitacan", "register messenger");
                     break;
-                case 1:
+                case MSG_UNREGISTER_CLIENT:
                     Log.d("chitacan", "unregister messenger");
                     mClients.remove(msg.replyTo);
                     break;
-                case 2:
-                    Log.d("chitacan", "msg");
+                case MSG_CREATE_BRIDGE:
+                    Log.d("chitacan", "create bridge");
+                    createBridge(msg.getData());
+                    break;
+                case MSG_REMOVE_BRIDGE:
+                    Log.d("chitacan", "remove bridge");
+                    removeBridge();
                     break;
                 default:
                     super.handleMessage(msg);
@@ -51,16 +62,6 @@ public class BridgeService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("chitacan", "onStartCommand");
-        if (mBridge != null)
-            mBridge.remove();
-
-        Bundle bundle = intent.getBundleExtra("server");
-
-        if (bundle != null) {
-            mBridge = new Bridge();
-            mBridge.create(bundle);
-        }
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -79,10 +80,26 @@ public class BridgeService extends Service {
     @Override
     public void onDestroy() {
         Log.d("chitacan", "onDestroy");
+        super.onDestroy();
+    }
+
+    private void createBridge(Bundle bundle) {
+        if (mBridge != null)
+            mBridge.remove();
+
+        if (bundle != null) {
+            if (!bundle.containsKey("adbport"))
+                bundle.putInt("adbport", 6666);
+
+            mBridge = new Bridge();
+            mBridge.create(bundle);
+        }
+    }
+
+    private void removeBridge() {
         if (mBridge != null) {
             mBridge.remove();
             mBridge = null;
         }
-        super.onDestroy();
     }
 }

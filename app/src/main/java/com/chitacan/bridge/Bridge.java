@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -35,22 +36,23 @@ public class Bridge {
     private DaemonBridge mDaemon = null;
 
     public void create(Bundle bundle) {
-        String adbdPort = bundle.getString("adbport");
-        String host = bundle.getString("host");
-        String port = bundle.getString("port");
+        String host     = bundle.getString("host");
+        String clientId = bundle.getString("clientId");
+        int port        = bundle.getInt("port");
+        int adbdPort    = bundle.getInt("adbport");
 
         if (mServer == null) {
             mServer = new ServerBridge();
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
-            mDaemon = new DaemonBridge();
+            mDaemon = new DaemonBridge(adbdPort);
             mDaemon.setServer(mServer);
             mDaemon.start();
         }
 
         mServer.setDaemon(mDaemon);
-        mServer.connect(Util.createUrl(host, Integer.parseInt(port), "bridge/daemon"));
+        mServer.connect(Util.createUrl(host, port, "bridge/daemon"), clientId);
     }
 
     public void remove() {
@@ -92,6 +94,7 @@ public class Bridge {
         private Handler mStatusHandler = null;
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
+        private String mClientId = null;
 
         public ServerBridge() {
             mOpt.forceNew             = true;
@@ -167,6 +170,7 @@ public class Bridge {
                 obj.put("type"         , Build.TYPE);
                 obj.put("version"      , Build.VERSION.RELEASE);
                 obj.put("sdk_version"  , Build.VERSION.SDK_INT);
+                obj.put("clientId"     , mClientId);
                 return obj;
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -178,7 +182,8 @@ public class Bridge {
             mSocket.emit(event, args);
         }
 
-        public Socket connect(String url) {
+        public Socket connect(String url, String clientId) {
+            mClientId = clientId;
             if (mSocket != null) {
                 disconnect();
             }
@@ -209,6 +214,7 @@ public class Bridge {
         }
 
         private void setStatus(String status) {
+            Log.d("chitacan", status);
             if (mStatusHandler == null) return;
 
             Message msg = mStatusHandler.obtainMessage();
@@ -232,7 +238,10 @@ public class Bridge {
         private InetSocketAddress mLAddr = null;
         private Handler mStatusHandler = null;
 
-        DaemonBridge() {
+        private int mAdbPort = 0;
+
+        DaemonBridge(int adbPort) {
+            mAdbPort = adbPort;
             this.setName("Daemon");
         }
 
@@ -264,7 +273,7 @@ public class Bridge {
         }
 
         private void init() throws IOException {
-            mLAddr = new InetSocketAddress("127.0.0.1", 6666);
+            mLAddr = new InetSocketAddress("127.0.0.1", mAdbPort);
             mSelector = Selector.open();
             channel = SocketChannel.open();
             channel.configureBlocking(false);
@@ -364,6 +373,7 @@ public class Bridge {
         }
 
         private void setStatus(String status) {
+            Log.d("chitacan", status);
             if (mStatusHandler == null) return;
 
             Message msg = mStatusHandler.obtainMessage();

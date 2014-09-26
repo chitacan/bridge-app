@@ -3,17 +3,9 @@ package com.chitacan.bridge;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,19 +43,18 @@ public class MainActivity extends Activity
         fragmentManager.beginTransaction()
                 .replace(R.id.container, ManualFragment.newInstance(0))
                 .commit();
+
+        Intent intent = new Intent(this, BridgeService.class);
+        startService(intent);
     }
 
     @Override
     protected void onResume() {
-        Intent intent = new Intent(this, BridgeService.class);
-//        startService(intent);
-        doBindService();
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
-        doUnbindService();
         super.onDestroy();
     }
 
@@ -136,76 +127,4 @@ public class MainActivity extends Activity
     public void onFragmentInteraction(Uri uri) {
 
     }
-
-    private boolean mIsBound = false;
-
-    private void doBindService() {
-        // Establish a connection with the service.  We use an explicit
-        // class name because there is no reason to be able to let other
-        // applications replace our component.
-        bindService(new Intent(this, BridgeService.class), mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
-    }
-
-    private void doUnbindService() {
-        if (mIsBound) {
-            // If we have received the service, and hence registered with
-            // it, then now is the time to unregister.
-            if (mService != null) {
-                try {
-                    Message msg = Message.obtain(null, 1);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            // Detach our existing connection.
-            unbindService(mConnection);
-            mIsBound = false;
-        }
-    }
-
-
-    class Incominghandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    private Messenger mService;
-    private final Messenger mMessenger = new Messenger(new Incominghandler());
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = new Messenger(service);
-
-            try {
-                Message msg = Message.obtain(null, 0);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-
-                msg = Message.obtain(null, 2);
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-        }
-    };
 }

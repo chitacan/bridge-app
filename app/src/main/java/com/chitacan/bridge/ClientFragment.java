@@ -3,8 +3,16 @@ package com.chitacan.bridge;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -72,8 +80,9 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
         RestKit.BridgeAPI api = restAdapter.create(RestKit.BridgeAPI.class);
         api.listClients(this);
-    }
 
+        bindService();
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -111,6 +120,12 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbindService();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -119,6 +134,21 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+
+        if (mIsBound && mService != null) {
+            RestKit.Client client = (RestKit.Client) l.getItemAtPosition(position);
+
+            Bundle bundle = getArguments();
+            bundle.putString("clientId", client.value);
+
+            try {
+                Message msg = Message.obtain(null, BridgeService.MSG_CREATE_BRIDGE);
+                msg.setData(bundle);
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
 
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
@@ -180,4 +210,77 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
             return v;
         }
     }
+
+    private boolean mIsBound = false;
+
+    private void bindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because there is no reason to be able to let other
+        // applications replace our component.
+        Intent intent = new Intent(getActivity(), BridgeService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    private void unbindService() {
+        if (mIsBound) {
+            // If we have received the service, and hence registered with
+            // it, then now is the time to unregister.
+            if (mService != null) {
+                try {
+                    Message msg = Message.obtain(null, BridgeService.MSG_UNREGISTER_CLIENT);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Detach our existing connection.
+            getActivity().unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+
+    class Incominghandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case BridgeService.MSG_STATUS_BRIDGE:
+                    break;
+
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    private Messenger mService;
+    private final Messenger mMessenger = new Messenger(new Incominghandler());
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+
+            try {
+                Message msg = Message.obtain(null, BridgeService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+
+                msg = Message.obtain(null, BridgeService.MSG_STATUS_BRIDGE);
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+        }
+    };
 }
