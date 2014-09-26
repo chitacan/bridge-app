@@ -13,5 +13,7 @@
     <string name="title_activity_client">ClientActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_remove">Remove</string>
+    <string name="server_empty_desc">No servers. Try add one.</string>
+    <string name="server_empty_btn">Add Server</string>
 
 </resources>

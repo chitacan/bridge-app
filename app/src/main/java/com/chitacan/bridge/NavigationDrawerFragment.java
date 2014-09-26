@@ -4,6 +4,7 @@ package com.chitacan.bridge;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -122,8 +123,9 @@ public class NavigationDrawerFragment
 
         mAdapter = new ServerListAdapter(getActivity());
 
-        mDrawerListView = (ListView) inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+        View v = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        mDrawerListView = (ListView) v.findViewById(R.id.server_list);
+        mDrawerListView.setEmptyView(v.findViewById(R.id.server_empty));
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -143,8 +145,21 @@ public class NavigationDrawerFragment
                 return true;
             }
         });
+        v.findViewById(R.id.btn_add_server).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getFragmentManager();
+                if (!(fragmentManager.findFragmentById(R.id.container) instanceof AddFragment)) {
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, AddFragment.newInstance("", ""))
+                            .addToBackStack(null)
+                            .commit();
+                }
+                mDrawerLayout.closeDrawers();
+            }
+        });
         mDrawerListView.setAdapter(mAdapter);
-        return mDrawerListView;
+        return v;
     }
 
     public boolean isDrawerOpen() {
@@ -163,7 +178,6 @@ public class NavigationDrawerFragment
 
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
