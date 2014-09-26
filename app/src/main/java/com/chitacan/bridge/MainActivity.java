@@ -41,7 +41,7 @@ public class MainActivity extends Activity
 
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(0))
+                .replace(R.id.container, ManualFragment.newInstance(0))
                 .commit();
     }
 

@@ -36,7 +36,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlaceholderFragment extends Fragment implements View.OnClickListener{
+public class ManualFragment extends Fragment implements View.OnClickListener{
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
@@ -65,15 +65,15 @@ public class PlaceholderFragment extends Fragment implements View.OnClickListene
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static PlaceholderFragment newInstance(int sectionNumber) {
-        PlaceholderFragment fragment = new PlaceholderFragment();
+    public static ManualFragment newInstance(int sectionNumber) {
+        ManualFragment fragment = new ManualFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public PlaceholderFragment() {
+    public ManualFragment() {
     }
 
     @Override
