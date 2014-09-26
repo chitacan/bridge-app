@@ -31,7 +31,7 @@ import retrofit.client.Response;
  * <p />
  * <p />
  */
-public class ClientFragment extends ListFragment implements Callback<List<API.Client>> {
+public class ClientFragment extends ListFragment implements Callback<List<RestKit.Client>> {
 
     private String mServerName;
     private String mServerHost;
@@ -70,8 +70,8 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
                 .setEndpoint(Util.createUrl(mServerHost, mServerPort, null))
                 .build();
 
-        API.BridgeService service = restAdapter.create(API.BridgeService.class);
-        service.listClients(this);
+        RestKit.BridgeAPI api = restAdapter.create(RestKit.BridgeAPI.class);
+        api.listClients(this);
     }
 
 
@@ -128,7 +128,7 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
     }
 
     @Override
-    public void success(List<API.Client> clients, Response response) {
+    public void success(List<RestKit.Client> clients, Response response) {
         mAdapter = new ClientListAdapter(getActivity(), clients);
         setListAdapter(mAdapter);
     }
@@ -160,9 +160,9 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
         public void onFragmentInteraction(String id);
     }
 
-    private class ClientListAdapter extends ArrayAdapter<API.Client> {
+    private class ClientListAdapter extends ArrayAdapter<RestKit.Client> {
 
-        public ClientListAdapter(Context context, List<API.Client> clients) {
+        public ClientListAdapter(Context context, List<RestKit.Client> clients) {
             super(context, 0, clients);
         }
 
@@ -173,7 +173,7 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
             TextView name  = (TextView) v.findViewById(android.R.id.text1);
             TextView value = (TextView) v.findViewById(android.R.id.text2);
 
-            API.Client client = getItem(position);
+            RestKit.Client client = getItem(position);
             name .setText(client.name);
             value.setText(client.value);
 

@@ -11,7 +11,7 @@ import retrofit.http.PUT;
 /**
  * Created by chitacan on 2014. 9. 25..
  */
-public class API {
+public class RestKit {
 
     static class Bridge {
         public String client;
@@ -27,7 +27,7 @@ public class API {
         public String result;
     }
 
-    public interface BridgeService {
+    public interface BridgeAPI {
 
         @GET("/api/bridge/client")
         void listClients(Callback<List<Client>> cb);
