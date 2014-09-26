@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentValues;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 
@@ -38,6 +40,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private EditText mServerName = null;
     private EditText mServerUrl  = null;
     private EditText mServerPort = null;
+
+    private InputMethodManager mImm;
 
     /**
      * Use this factory method to create a new instance of
@@ -67,6 +71,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mImm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         setHasOptionsMenu(true);
     }
 
@@ -101,6 +106,13 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mServerName.requestFocus();
+        mImm.showSoftInput(mServerName, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -122,6 +134,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         switch(v.getId()) {
             case R.id.btn_add:
                 addServer();
+                mImm.hideSoftInputFromWindow(getView().getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
                 getFragmentManager().popBackStack();
                 break;
         }
