@@ -74,13 +74,13 @@ public class NavigationDrawerFragment
     private static final int COLUMN_IDX_Id   = 0;
     private static final int COLUMN_IDX_NAME = 1;
     private static final int COLUMN_IDX_PORT = 2;
-    private static final int COLUMN_IDX_URL  = 3;
+    private static final int COLUMN_IDX_HOST = 3;
 
     private static final String[] PROJECTION = {
             ServerProvider._ID,
             ServerProvider.SERVER_NAME,
             ServerProvider.SERVER_PORT,
-            ServerProvider.SERVER_URL
+            ServerProvider.SERVER_Host
     };
 
     private ServerListAdapter mAdapter;
@@ -259,7 +259,7 @@ public class NavigationDrawerFragment
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         Bundle bundle = new Bundle();
         bundle.putString("name", cursor.getString(COLUMN_IDX_NAME));
-        bundle.putString("url",  cursor.getString(COLUMN_IDX_URL ));
+        bundle.putString("host",  cursor.getString(COLUMN_IDX_HOST));
         bundle.putInt("port", cursor.getInt(COLUMN_IDX_PORT));
         bundle.putInt("id", cursor.getInt(COLUMN_IDX_Id));
         return bundle;
@@ -396,10 +396,10 @@ public class NavigationDrawerFragment
         public void bindView(View view, Context context, Cursor cursor) {
 
             TextView title = (TextView) view.findViewById(android.R.id.text1);
-            TextView url   = (TextView) view.findViewById(android.R.id.text2);
+            TextView host  = (TextView) view.findViewById(android.R.id.text2);
 
             title.setText(cursor.getString(COLUMN_IDX_NAME));
-            url  .setText(cursor.getString(COLUMN_IDX_URL ));
+            host .setText(cursor.getString(COLUMN_IDX_HOST ));
         }
     }
 

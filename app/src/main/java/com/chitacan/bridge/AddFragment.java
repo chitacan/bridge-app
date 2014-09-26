@@ -39,7 +39,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     private OnFragmentInteractionListener mListener;
 
     private EditText mServerName = null;
-    private EditText mServerUrl  = null;
+    private EditText mServerHost = null;
     private EditText mServerPort = null;
 
     private InputMethodManager mImm;
@@ -81,7 +81,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add, container, false);
         mServerName = (EditText) view.findViewById(R.id.edit_server_name);
-        mServerUrl  = (EditText) view.findViewById(R.id.edit_server_url);
+        mServerHost = (EditText) view.findViewById(R.id.edit_server_host);
         mServerPort = (EditText) view.findViewById(R.id.edit_server_port);
         view.findViewById(R.id.btn_add).setOnClickListener(this);
 
@@ -135,7 +135,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         switch(v.getId()) {
             case R.id.btn_add:
                 if (addServer()) {
-                    mImm.hideSoftInputFromWindow(getView().getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    mImm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
                     getFragmentManager().popBackStack();
                 }
                 break;
@@ -144,7 +144,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
 
     private boolean addServer() {
         String name = mServerName.getText().toString();
-        String url  = mServerUrl .getText().toString();
+        String host = mServerHost.getText().toString();
         String port = mServerPort.getText().toString();
 
         if (name.isEmpty()) {
@@ -153,9 +153,9 @@ public class AddFragment extends Fragment implements View.OnClickListener {
             return false;
         }
 
-        if (url.isEmpty()) {
+        if (host.isEmpty()) {
             Toast.makeText(getActivity(), "Hostname is required", Toast.LENGTH_LONG).show();
-            mServerUrl.requestFocus();
+            mServerHost.requestFocus();
             return false;
         }
 
@@ -164,7 +164,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         ContentValues values = new ContentValues();
 
         values.put(ServerProvider.SERVER_NAME, name);
-        values.put(ServerProvider.SERVER_URL , url );
+        values.put(ServerProvider.SERVER_Host, host );
         values.put(ServerProvider.SERVER_PORT, p);
 
         Uri uri = getActivity().getContentResolver().insert(ServerProvider.CONTENT_URI, values);

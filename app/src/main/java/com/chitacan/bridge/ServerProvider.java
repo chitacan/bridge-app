@@ -26,7 +26,7 @@ public class ServerProvider extends ContentProvider{
 
     static final String _ID         = "_id";
     static final String SERVER_NAME = "name";
-    static final String SERVER_URL  = "url";
+    static final String SERVER_Host = "host";
     static final String SERVER_PORT = "port";
 
     private static HashMap<String, String> SERVER_PROJECTION_MAP;
@@ -50,7 +50,7 @@ public class ServerProvider extends ContentProvider{
             " CREATE TABLE " + SERVER_TABLE_NAME +
             " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             " name TEXT NOT NULL, " +
-            " url TEXT NOT NULL, " +
+            " host TEXT NOT NULL, " +
             " port INTEGER);";
 
     private static class DbHelper extends SQLiteOpenHelper {

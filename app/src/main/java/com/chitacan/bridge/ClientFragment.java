@@ -34,7 +34,7 @@ import retrofit.client.Response;
 public class ClientFragment extends ListFragment implements Callback<List<API.Client>> {
 
     private String mServerName;
-    private String mServerUrl;
+    private String mServerHost;
     private int mServerPort;
     private ClientListAdapter mAdapter;
 
@@ -60,14 +60,14 @@ public class ClientFragment extends ListFragment implements Callback<List<API.Cl
 
         if (getArguments() != null) {
             mServerName = getArguments().getString("name");
-            mServerUrl  = getArguments().getString("url");
+            mServerHost = getArguments().getString("host");
             mServerPort = getArguments().getInt("port");
         }
 
         setHasOptionsMenu(true);
 
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(Util.createUrl(mServerUrl, mServerPort, null))
+                .setEndpoint(Util.createUrl(mServerHost, mServerPort, null))
                 .build();
 
         API.BridgeService service = restAdapter.create(API.BridgeService.class);

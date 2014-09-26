@@ -18,11 +18,11 @@
         android:singleLine="true" />
 
     <EditText
-        android:id="@+id/edit_server_url"
+        android:id="@+id/edit_server_host"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:hint="Server URL"
+        android:hint="Remote Hostname"
         android:layout_below="@+id/edit_server_name"
         android:inputType="textUri"
         android:minWidth="240dip"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/edit_server_name"
-        android:layout_toRightOf="@+id/edit_server_url"
+        android:layout_toRightOf="@+id/edit_server_host"
         android:hint="80"
         android:inputType="number"
         android:maxLength="5"
