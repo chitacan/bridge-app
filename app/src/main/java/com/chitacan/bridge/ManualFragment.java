@@ -10,21 +10,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Manager;
 import com.github.nkzawa.socketio.client.Socket;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;

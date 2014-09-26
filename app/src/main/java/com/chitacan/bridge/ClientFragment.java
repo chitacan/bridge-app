@@ -97,6 +97,8 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.client, menu);
+
         ActionBar actionbar = getActivity().getActionBar();
         actionbar.setTitle(mServerName);
         actionbar.setDisplayHomeAsUpEnabled(true);
@@ -114,6 +116,21 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(getActivity());
+                return true;
+            case R.id.action_connect:
+                if (!mIsBound && mService == null)
+                    return true;
+
+                try {
+                    Message msg = Message.obtain(null, BridgeService.MSG_CREATE_BRIDGE);
+                    msg.setData(getArguments());
+                    mService.send(msg);
+
+                    setListShown(false);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -145,6 +162,8 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 Message msg = Message.obtain(null, BridgeService.MSG_CREATE_BRIDGE);
                 msg.setData(bundle);
                 mService.send(msg);
+
+                setListShown(false);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -161,6 +180,8 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     public void success(List<RestKit.Client> clients, Response response) {
         mAdapter = new ClientListAdapter(getActivity(), clients);
         setListAdapter(mAdapter);
+
+        setEmptyText("No connected clients :(");
     }
 
     @Override
@@ -214,9 +235,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     private boolean mIsBound = false;
 
     private void bindService() {
-        // Establish a connection with the service.  We use an explicit
-        // class name because there is no reason to be able to let other
-        // applications replace our component.
         Intent intent = new Intent(getActivity(), BridgeService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
@@ -224,8 +242,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     private void unbindService() {
         if (mIsBound) {
-            // If we have received the service, and hence registered with
-            // it, then now is the time to unregister.
             if (mService != null) {
                 try {
                     Message msg = Message.obtain(null, BridgeService.MSG_UNREGISTER_CLIENT);
@@ -236,7 +252,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 }
             }
 
-            // Detach our existing connection.
             getActivity().unbindService(mConnection);
             mIsBound = false;
         }
@@ -251,6 +266,9 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 case BridgeService.MSG_STATUS_BRIDGE:
                     break;
 
+                case BridgeService.MSG_BRIDGE_CREATED:
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                    break;
                 default:
                     super.handleMessage(msg);
             }
@@ -260,7 +278,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     private Messenger mService;
     private final Messenger mMessenger = new Messenger(new Incominghandler());
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {

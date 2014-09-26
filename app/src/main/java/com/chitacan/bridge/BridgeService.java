@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -18,6 +19,9 @@ public class BridgeService extends Service {
     static final int MSG_CREATE_BRIDGE     = 2;
     static final int MSG_REMOVE_BRIDGE     = 3;
     static final int MSG_STATUS_BRIDGE     = 4;
+
+    static final int MSG_BRIDGE_CREATED    = 5;
+    static final int MSG_BRIDGE_REMOVED    = 6;
 
     class IncomingHandler extends Handler {
 
@@ -35,6 +39,7 @@ public class BridgeService extends Service {
                 case MSG_CREATE_BRIDGE:
                     Log.d("chitacan", "create bridge");
                     createBridge(msg.getData());
+                    sendToClients(MSG_BRIDGE_CREATED, null);
                     break;
                 case MSG_REMOVE_BRIDGE:
                     Log.d("chitacan", "remove bridge");
@@ -81,6 +86,19 @@ public class BridgeService extends Service {
     public void onDestroy() {
         Log.d("chitacan", "onDestroy");
         super.onDestroy();
+    }
+
+    private void sendToClients(int what, Bundle bundle) {
+        Message msg = Message.obtain(null, what);
+        if (bundle != null)
+            msg.setData(bundle);
+
+        try {
+            for (Messenger client : mClients)
+                client.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createBridge(Bundle bundle) {

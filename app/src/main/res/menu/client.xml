@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ClientActivity" >
+    <item android:id="@+id/action_connect"
+        android:title="@string/action_connect"
+        android:showAsAction="withText|ifRoom" />
+</menu>
