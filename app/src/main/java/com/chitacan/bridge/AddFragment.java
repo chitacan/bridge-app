@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
 /**
@@ -133,17 +134,31 @@ public class AddFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_add:
-                addServer();
-                mImm.hideSoftInputFromWindow(getView().getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
-                getFragmentManager().popBackStack();
+                if (addServer()) {
+                    mImm.hideSoftInputFromWindow(getView().getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    getFragmentManager().popBackStack();
+                }
                 break;
         }
     }
 
-    private void addServer() {
+    private boolean addServer() {
         String name = mServerName.getText().toString();
         String url  = mServerUrl .getText().toString();
         String port = mServerPort.getText().toString();
+
+        if (name.isEmpty()) {
+            Toast.makeText(getActivity(), "Name is required", Toast.LENGTH_LONG).show();
+            mServerName.requestFocus();
+            return false;
+        }
+
+        if (url.isEmpty()) {
+            Toast.makeText(getActivity(), "Hostname is required", Toast.LENGTH_LONG).show();
+            mServerUrl.requestFocus();
+            return false;
+        }
+
         int p = port.length() == 0 ? 80 : Integer.parseInt(port);
 
         ContentValues values = new ContentValues();
@@ -153,6 +168,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         values.put(ServerProvider.SERVER_PORT, p);
 
         Uri uri = getActivity().getContentResolver().insert(ServerProvider.CONTENT_URI, values);
+
+        return true;
     }
 
     /**
