@@ -119,6 +119,9 @@ function onClientConnect(socket) {
       .concat(' ').concat(this.version)
     }
     this.hostInfo = data;
+
+    if (data.daemonId)
+      bridge.install({ client: socket.id, daemon: data.daemonId });
   });
   socket.on('bc-data', function(data) {
     this.transmit += data.binary.length;
@@ -161,6 +164,9 @@ function onDaemonConnect(socket) {
       .concat(' ').concat(this.version)
     }
     this.hostInfo = data;
+
+    if (data.clientId)
+      bridge.install({ client: data.clientId, daemon: socket.id });
   });
   socket.on('bd-collapse', function() {
     bridge.remove({daemon: socket.id});

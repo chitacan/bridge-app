@@ -62,15 +62,9 @@ Client.prototype.createSocket = function() {
       type     : os.type(),
       arch     : os.arch(),
       hostname : os.hostname(),
-      version  : os.release()
+      version  : os.release(),
+      daemonId : daemonId
     });
-
-    if (daemonId) {
-      installBridge(self.opt.url, {
-        client: socket.io.engine.id,
-        daemon: daemonId
-      });
-    }
   });
   socket.on('bs-collapse', function() {
     self.server.socket.end();
