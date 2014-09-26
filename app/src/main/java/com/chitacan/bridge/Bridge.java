@@ -1,28 +1,18 @@
 package com.chitacan.bridge;
 
-/**
- * Created by chitacan on 2014. 8. 20..
- */
-
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Manager;
 import com.github.nkzawa.socketio.client.Socket;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ConnectException;
@@ -37,117 +27,64 @@ import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Created by chitacan on 2014. 9. 26..
  */
-public class ManualFragment extends Fragment implements View.OnClickListener{
+public class Bridge {
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
 
-    private TextView mStatus     = null;
-
-    private EditText mLocalPort  = null;
-    private EditText mRemoteHost = null;
-    private EditText mRemotePort = null;
-
-    private Handler mHandler = new Handler() {
-
-        @Override
-        public void handleMessage(Message msg) {
-            String status = (String) msg.obj;
-            mStatus.setText(status);
-        }
-    };
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
-    public static ManualFragment newInstance(int sectionNumber) {
-        ManualFragment fragment = new ManualFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public ManualFragment() {
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        rootView.findViewById(R.id.btn_start).setOnClickListener(this);
-        rootView.findViewById(R.id.btn_stop) .setOnClickListener(this);
-        mStatus = (TextView) rootView.findViewById(R.id.section_status);
-        mLocalPort = (EditText) rootView.findViewById(R.id.edit_local_port);
-        mRemoteHost = (EditText) rootView.findViewById(R.id.edit_remote_addr);
-        mRemotePort = (EditText) rootView.findViewById(R.id.edit_remote_port);
-        return rootView;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(
-                getArguments().getInt(ARG_SECTION_NUMBER));
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_start:
-                startBridge();
-                break;
-            case R.id.btn_stop:
-                stopBridge();
-                break;
-        }
-    }
-
-    private void stopBridge() {
-        if (mDaemon != null)
-            mDaemon.interrupt();
-        mDaemon = null;
-        mServer.disconnect();
-    }
-
-    private void startBridge() {
-        String localPort  = mLocalPort.getText().toString();
-        String remoteHost = mRemoteHost.getText().toString();
-
-        if (remoteHost.isEmpty() || localPort.isEmpty()) {
-            Toast.makeText(getActivity(), "no host name or port number", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        String remotePort = mRemotePort.getText().toString();
-        remotePort = remotePort.isEmpty() ? "80" : remotePort;
+    public void create(Bundle bundle) {
+        String adbdPort = bundle.getString("adbport");
+        String host = bundle.getString("host");
+        String port = bundle.getString("port");
 
         if (mServer == null) {
             mServer = new ServerBridge();
-            mServer.setHandler(mHandler);
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
             mDaemon = new DaemonBridge();
             mDaemon.setServer(mServer);
-            mDaemon.setHandler(mHandler);
             mDaemon.start();
         }
-        mServer.setDaemon(mDaemon);
-        mServer.connect(Util.createUrl(remoteHost, Integer.parseInt(remotePort), "bridge/daemon"));
 
-        mStatus.setText("connecting...");
+        mServer.setDaemon(mDaemon);
+        mServer.connect(Util.createUrl(host, Integer.parseInt(port), "bridge/daemon"));
     }
 
-    class ServerBridge {
+    public void remove() {
+        if (mDaemon != null)
+            mDaemon.interrupt();
+
+        mDaemon = null;
+        mServer.disconnect();
+    }
+
+    public String getSocketId() {
+        if (mServer.isConnected()) {
+            Manager io = mServer.getSocket().io();
+
+            // retrieve socket id via reflection.
+            try {
+                Field fEngine = Manager.class.getDeclaredField("engine");
+                fEngine.setAccessible(true);
+                Object socket = fEngine.get(io);
+
+                Field fId = com.github.nkzawa.engineio.client.Socket.class.getDeclaredField("id");
+                fId.setAccessible(true);
+
+                return (String) fId.get(socket);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        throw new RuntimeException("Server not Connected.");
+    }
+
+    private class ServerBridge {
 
         private Socket mSocket = null;
         private boolean isConnected = false;
@@ -263,6 +200,10 @@ public class ManualFragment extends Fragment implements View.OnClickListener{
             return isConnected;
         }
 
+        public Socket getSocket() {
+            return mSocket;
+        }
+
         public void setHandler(Handler handler) {
             mStatusHandler = handler;
         }
@@ -277,7 +218,7 @@ public class ManualFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    class DaemonBridge extends Thread {
+    private class DaemonBridge extends Thread {
         private Selector mSelector = null;
         private ServerBridge mServer = null;
         private ArrayBlockingQueue mQueue = new ArrayBlockingQueue(10);
