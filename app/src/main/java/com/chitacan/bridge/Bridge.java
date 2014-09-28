@@ -34,25 +34,23 @@ public class Bridge {
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
+    private Bundle mBridgeInfo;
 
     public void create(Bundle bundle) {
-        String host     = bundle.getString("host");
-        String clientId = bundle.getString("clientId");
-        int port        = bundle.getInt("port");
-        int adbdPort    = bundle.getInt("adbport");
+        mBridgeInfo = bundle;
 
         if (mServer == null) {
             mServer = new ServerBridge();
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
-            mDaemon = new DaemonBridge(adbdPort);
+            mDaemon = new DaemonBridge(bundle.getInt("adbport"));
             mDaemon.setServer(mServer);
             mDaemon.start();
         }
 
         mServer.setDaemon(mDaemon);
-        mServer.connect(Util.createUrl(host, port, "bridge/daemon"), clientId);
+        mServer.connect(bundle);
     }
 
     public void remove() {
@@ -63,27 +61,19 @@ public class Bridge {
         mServer.disconnect();
     }
 
-    public String getSocketId() {
-        if (mServer.isConnected()) {
-            Manager io = mServer.getSocket().io();
+    public Bundle getStatus() {
+        Bundle bundle = new Bundle();
 
-            // retrieve socket id via reflection.
-            try {
-                Field fEngine = Manager.class.getDeclaredField("engine");
-                fEngine.setAccessible(true);
-                Object socket = fEngine.get(io);
+        if (mBridgeInfo != null)
+            bundle.putAll(mBridgeInfo);
 
-                Field fId = com.github.nkzawa.engineio.client.Socket.class.getDeclaredField("id");
-                fId.setAccessible(true);
+        if (mServer != null)
+            bundle.putAll(mServer.getStatus());
 
-                return (String) fId.get(socket);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new RuntimeException("Server not Connected.");
+        if (mDaemon != null)
+            bundle.putAll(mDaemon.getStatus());
+
+        return bundle;
     }
 
     private class ServerBridge {
@@ -95,6 +85,7 @@ public class Bridge {
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
         private String mClientId = null;
+        private String mStatus = null;
 
         public ServerBridge() {
             mOpt.forceNew             = true;
@@ -102,9 +93,9 @@ public class Bridge {
             mOpt.reconnectionDelayMax = 20 * 1000;
         }
 
-        private void createSocket(String url) {
+        private void createSocket() {
             try {
-                mSocket = IO.socket(url, mOpt);
+                mSocket = IO.socket(mUrl, mOpt);
                 subscribe();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -182,13 +173,17 @@ public class Bridge {
             mSocket.emit(event, args);
         }
 
-        public Socket connect(String url, String clientId) {
-            mClientId = clientId;
+        public Socket connect(Bundle bundle) {
+            String host = bundle.getString("host");
+            int    port = bundle.getInt("port");
+
+            mUrl      = Util.createUrl(host, port, "bridge/daemon");
+            mClientId = bundle.getString("clientId");
+
             if (mSocket != null) {
                 disconnect();
             }
-            mUrl = url;
-            createSocket(url);
+            createSocket();
             return mSocket.connect();
         }
 
@@ -215,12 +210,45 @@ public class Bridge {
 
         private void setStatus(String status) {
             Log.d("chitacan", status);
+            mStatus = status;
             if (mStatusHandler == null) return;
 
             Message msg = mStatusHandler.obtainMessage();
             msg.what = 0;
             msg.obj = status;
             mStatusHandler.sendMessage(msg);
+        }
+
+        public String getSocketId() {
+            if (isConnected()) {
+                Manager io = mSocket.io();
+
+                // retrieve socket id via reflection.
+                try {
+                    Field fEngine = Manager.class.getDeclaredField("engine");
+                    fEngine.setAccessible(true);
+                    Object socket = fEngine.get(io);
+
+                    Field fId = com.github.nkzawa.engineio.client.Socket.class.getDeclaredField("id");
+                    fId.setAccessible(true);
+
+                    return (String) fId.get(socket);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Server not Connected.");
+        }
+
+        public Bundle getStatus() {
+            Bundle bundle = new Bundle();
+
+            bundle.putBoolean("server_connected", isConnected());
+            bundle.putString("server_endpoint", mUrl);
+            bundle.putString("server_status", mStatus);
+            return bundle;
         }
     }
 
@@ -239,6 +267,7 @@ public class Bridge {
         private Handler mStatusHandler = null;
 
         private int mAdbPort = 0;
+        private String mStatus = null;
 
         DaemonBridge(int adbPort) {
             mAdbPort = adbPort;
@@ -374,12 +403,21 @@ public class Bridge {
 
         private void setStatus(String status) {
             Log.d("chitacan", status);
+            mStatus = status;
             if (mStatusHandler == null) return;
 
             Message msg = mStatusHandler.obtainMessage();
             msg.what = 0;
             msg.obj = status;
             mStatusHandler.sendMessage(msg);
+        }
+
+        public Bundle getStatus() {
+            Bundle bundle = new Bundle();
+
+            bundle.putBoolean("daemon_connected", channel.isConnected());
+            bundle.putString("daemon_status", mStatus);
+            return bundle;
         }
     }
 }

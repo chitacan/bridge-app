@@ -14,6 +14,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,8 +81,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
         RestKit.BridgeAPI api = restAdapter.create(RestKit.BridgeAPI.class);
         api.listClients(this);
-
-        bindService();
     }
 
     @Override
@@ -130,10 +129,20 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        bindService();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -264,9 +273,11 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case BridgeService.MSG_STATUS_BRIDGE:
+                    Log.d("chitacan", "MSG_STATUS_BRIDGE");
                     break;
 
                 case BridgeService.MSG_BRIDGE_CREATED:
+                    Log.d("chitacan", "MSG_BRIDGE_CREATED");
                     NavUtils.navigateUpFromSameTask(getActivity());
                     break;
                 default:

@@ -1,0 +1,188 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.chitacan.bridge.StatusFragment"
+    android:padding="8dip">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="adbport :"
+        android:id="@+id/status_adbport_desc"
+        android:layout_gravity="left|top" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_adbport"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/status_adbport_desc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="name :"
+        android:id="@+id/status_name_desc"
+        android:layout_below="@+id/status_adbport_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_name"
+        android:layout_below="@+id/status_adbport"
+        android:layout_toEndOf="@+id/status_adbport_desc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="host :"
+        android:id="@+id/status_host_desc"
+        android:layout_below="@+id/status_name_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_host"
+        android:layout_below="@+id/status_name"
+        android:layout_alignStart="@+id/status_name" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="port :"
+        android:id="@+id/status_port_desc"
+        android:layout_below="@+id/status_host_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_port"
+        android:layout_below="@+id/status_host"
+        android:layout_alignStart="@+id/status_host" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="clientId :"
+        android:id="@+id/status_clientid_desc"
+        android:layout_below="@+id/status_port_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_clientid"
+        android:layout_below="@+id/status_port"
+        android:layout_alignStart="@+id/status_port" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="server connected :"
+        android:id="@+id/status_server_connected_desc"
+        android:layout_below="@+id/status_clientid_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_server_connected"
+        android:layout_alignBottom="@+id/status_server_connected_desc"
+        android:layout_toEndOf="@+id/status_server_connected_desc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="server endpoint :"
+        android:id="@+id/status_server_endpoint_desc"
+        android:layout_below="@+id/status_server_connected_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_server_endpoint"
+        android:singleLine="true"
+        android:layout_below="@+id/status_server_connected_desc"
+        android:layout_toEndOf="@+id/status_server_endpoint_desc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="server status :"
+        android:id="@+id/status_server_desc"
+        android:layout_below="@+id/status_server_endpoint_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_server"
+        android:layout_below="@+id/status_server_endpoint_desc"
+        android:layout_toEndOf="@+id/status_server_desc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="daemon connected :"
+        android:id="@+id/status_daemon_connected_desc"
+        android:layout_below="@+id/status_server_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_daemon_connected"
+        android:layout_below="@+id/status_server"
+        android:layout_toEndOf="@+id/status_daemon_connected_desc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="daemon status :"
+        android:id="@+id/status_daemon_desc"
+        android:layout_below="@+id/status_daemon_connected_desc"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/status_daemon"
+        android:layout_below="@+id/status_daemon_connected_desc"
+        android:layout_toEndOf="@+id/status_daemon_desc" />
+
+</RelativeLayout>

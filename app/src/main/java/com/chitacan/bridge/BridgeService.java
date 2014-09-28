@@ -44,6 +44,12 @@ public class BridgeService extends Service {
                 case MSG_REMOVE_BRIDGE:
                     Log.d("chitacan", "remove bridge");
                     removeBridge();
+                    sendToClients(MSG_BRIDGE_REMOVED, null);
+                    break;
+                case MSG_STATUS_BRIDGE:
+                    Log.d("chitacan", "MSG_STATUS_BRIDGE");
+                    if (mBridge != null)
+                        sendToClients(msg.what, mBridge.getStatus());
                     break;
                 default:
                     super.handleMessage(msg);
@@ -93,11 +99,12 @@ public class BridgeService extends Service {
         if (bundle != null)
             msg.setData(bundle);
 
-        try {
-            for (Messenger client : mClients)
-                client.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        for (int i = mClients.size()-1; i >= 0; i--) {
+            try {
+                mClients.get(i).send(msg);
+            } catch (RemoteException e) {
+                mClients.remove(i);
+            }
         }
     }
 
