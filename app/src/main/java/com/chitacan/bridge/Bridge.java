@@ -3,7 +3,7 @@ package com.chitacan.bridge;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.os.Looper;
 import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -30,11 +30,29 @@ import java.util.concurrent.ArrayBlockingQueue;
 /**
  * Created by chitacan on 2014. 9. 26..
  */
-public class Bridge {
+public class Bridge implements Runnable{
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
     private Bundle mBridgeInfo;
+    private UpdateListener mUpdateListener;
+    private Handler mMainHandler;
+
+    public Bridge() {
+        this(null);
+    }
+
+    public Bridge(UpdateListener listener) {
+        mUpdateListener = listener;
+        mMainHandler = new Handler(Looper.getMainLooper());
+    }
+
+    private void update() {
+        if (mUpdateListener == null)
+            return;
+
+        mMainHandler.post(this);
+    }
 
     public void create(Bundle bundle) {
         mBridgeInfo = bundle;
@@ -76,12 +94,16 @@ public class Bridge {
         return bundle;
     }
 
+    @Override
+    public void run() {
+        mUpdateListener.onUpdate(getStatus());
+    }
+
     private class ServerBridge {
 
         private Socket mSocket = null;
         private boolean isConnected = false;
         private DaemonBridge mDaemon = null;
-        private Handler mStatusHandler = null;
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
         private String mClientId = null;
@@ -204,19 +226,10 @@ public class Bridge {
             return mSocket;
         }
 
-        public void setHandler(Handler handler) {
-            mStatusHandler = handler;
-        }
-
         private void setStatus(String status) {
             Log.d("chitacan", status);
             mStatus = status;
-            if (mStatusHandler == null) return;
-
-            Message msg = mStatusHandler.obtainMessage();
-            msg.what = 0;
-            msg.obj = status;
-            mStatusHandler.sendMessage(msg);
+            update();
         }
 
         public String getSocketId() {
@@ -264,7 +277,6 @@ public class Bridge {
         private ByteBuffer mRBuffer = ByteBuffer.allocateDirect(6 * 1024);
 
         private InetSocketAddress mLAddr = null;
-        private Handler mStatusHandler = null;
 
         private int mAdbPort = 0;
         private String mStatus = null;
@@ -397,19 +409,10 @@ public class Bridge {
             super.interrupt();
         }
 
-        public void setHandler(Handler handler) {
-            mStatusHandler = handler;
-        }
-
         private void setStatus(String status) {
             Log.d("chitacan", status);
             mStatus = status;
-            if (mStatusHandler == null) return;
-
-            Message msg = mStatusHandler.obtainMessage();
-            msg.what = 0;
-            msg.obj = status;
-            mStatusHandler.sendMessage(msg);
+            update();
         }
 
         public Bundle getStatus() {
@@ -420,4 +423,9 @@ public class Bridge {
             return bundle;
         }
     }
+
+    interface UpdateListener {
+        public void onUpdate(Bundle bundle);
+    }
+
 }

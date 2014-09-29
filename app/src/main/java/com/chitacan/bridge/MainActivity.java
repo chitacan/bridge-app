@@ -40,10 +40,6 @@ public class MainActivity extends Activity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         FragmentManager fragmentManager = getFragmentManager();
-//        fragmentManager.beginTransaction()
-//                .replace(R.id.container, ManualFragment.newInstance(0))
-//                .commit();
-
         fragmentManager.beginTransaction()
                 .replace(R.id.container, StatusFragment.newInstance())
                 .commit();

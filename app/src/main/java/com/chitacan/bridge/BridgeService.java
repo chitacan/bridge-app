@@ -1,43 +1,47 @@
 package com.chitacan.bridge;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-public class BridgeService extends Service {
+import com.squareup.otto.Produce;
+import com.squareup.otto.Subscribe;
+
+public class BridgeService extends Service implements Bridge.UpdateListener{
 
     private Bridge mBridge;
+    private boolean mIsRegistered = false;
 
     public BridgeService() {
     }
 
     @Override
     public void onCreate() {
-        Log.d("chitacan", "onCreate");
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("chitacan", "onStartCommand");
-        return super.onStartCommand(intent, flags, startId);
+        if (!mIsRegistered) {
+            BusProvider.getInstance().register(this);
+            mIsRegistered = true;
+        }
+        return START_STICKY;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d("chitacan", "onUnBind");
         return super.onUnbind(intent);
     }
 
     @Override
     public void onDestroy() {
-        Log.d("chitacan", "onDestroy");
+        if (mIsRegistered) {
+            BusProvider.getInstance().unregister(this);
+            mIsRegistered = false;
+        }
         super.onDestroy();
     }
 
@@ -54,7 +58,7 @@ public class BridgeService extends Service {
             if (!bundle.containsKey("adbport"))
                 bundle.putInt("adbport", 6666);
 
-            mBridge = new Bridge();
+            mBridge = new Bridge(this);
             mBridge.create(bundle);
         }
     }
@@ -64,5 +68,27 @@ public class BridgeService extends Service {
             mBridge.remove();
             mBridge = null;
         }
+    }
+
+    @Subscribe
+    public void bridgeEvent(BridgeEvent event) {
+        switch (event.type) {
+            case BridgeEvent.CREATE:
+                createBridge(event.bundle);
+                break;
+            case BridgeEvent.REMOVE:
+                removeBridge();
+                break;
+        }
+    }
+
+    @Override
+    public void onUpdate(Bundle bundle) {
+        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS, bundle));
+    }
+
+    @Produce
+    public BridgeEvent produceBridgeStatus() {
+        return new BridgeEvent(BridgeEvent.STATUS, mBridge == null ? null : mBridge.getStatus());
     }
 }

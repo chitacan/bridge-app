@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,12 +55,14 @@ public class StatusFragment extends Fragment {
 
     @Override
     public void onResume() {
+        BusProvider.getInstance().register(this);
         super.onResume();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        BusProvider.getInstance().unregister(this);
+        super.onPause();
     }
 
     @Override
@@ -97,5 +101,11 @@ public class StatusFragment extends Fragment {
         mServerStatus.setText(bundle.containsKey("server_status") ? bundle.getString("server_status") : "");
         mDaemonConnected.setText(bundle.containsKey("daemon_connected") ? String.valueOf(bundle.getBoolean("daemon_connected")) : "");
         mDaemonStatus.setText(bundle.containsKey("daemon_status") ? bundle.getString("daemon_status") : "");
+    }
+
+    @Subscribe
+    public void bridgeEvent(BridgeEvent event) {
+        if (event.type == BridgeEvent.STATUS)
+            update(event.bundle);
     }
 }

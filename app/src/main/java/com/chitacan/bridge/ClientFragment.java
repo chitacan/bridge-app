@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chitacan.bridge.dummy.DummyContent;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -108,6 +109,9 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 NavUtils.navigateUpFromSameTask(getActivity());
                 return true;
             case R.id.action_connect:
+                getArguments().remove("clientId");
+                BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATE, getArguments()));
+                setListShown(false);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -115,12 +119,14 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     @Override
     public void onResume() {
+        BusProvider.getInstance().register(this);
         super.onResume();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        BusProvider.getInstance().unregister(this);
+        super.onPause();
     }
 
     @Override
@@ -137,6 +143,11 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+
+        RestKit.Client client = (RestKit.Client) l.getItemAtPosition(position);
+        Bundle bundle = getArguments();
+        bundle.putString("clientId", client.value);
+        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATE, bundle));
 
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
@@ -198,6 +209,18 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
             value.setText(client.value);
 
             return v;
+        }
+    }
+
+    @Subscribe
+    public void bridgeEvent(BridgeEvent event) {
+        if (event.type != BridgeEvent.STATUS) return;
+
+        Bundle b = event.bundle;
+        if (b == null) return;
+
+        if (b.getBoolean("server_connected", false)) {
+            NavUtils.navigateUpFromSameTask(getActivity());
         }
     }
 }
