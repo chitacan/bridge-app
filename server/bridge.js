@@ -71,6 +71,7 @@ Bridge.prototype.remove = function(ids) {
   });
   var skt = this.getSocketById(removed[0]);
   skt.client && skt.client.emit('bs-collapse');
+  skt.daemon && skt.daemon.emit('bs-collapse');
   setBridgeId(skt);
   this.cache = '';
 }
