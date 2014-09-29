@@ -55,7 +55,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
 
         if (bundle != null) {
             if (!bundle.containsKey("adbport"))
-                bundle.putInt("adbport", 6666);
+                bundle.putInt("adbport", 6667);
 
             mBridge = new Bridge(this);
             mBridge.create(bundle);

@@ -100,7 +100,7 @@ public class StatusFragment extends Fragment {
         mServerEndPoint.setText(bundle.containsKey("server_endpoint") ? bundle.getString("server_endpoint") : "");
         mServerStatus.setText(bundle.containsKey("server_status") ? bundle.getString("server_status") : "");
         mDaemonConnected.setText(bundle.containsKey("daemon_connected") ? String.valueOf(bundle.getBoolean("daemon_connected")) : "");
-        mDaemonStatus.setText(bundle.containsKey("daemon_status") ? bundle.getString("daemon_status") : "");
+        mDaemonStatus.setText(bundle.containsKey("daemon_status") ? String.valueOf(bundle.getInt("daemon_status")) : "");
     }
 
     @Subscribe

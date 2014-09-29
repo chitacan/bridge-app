@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -31,6 +30,12 @@ import java.util.concurrent.ArrayBlockingQueue;
  * Created by chitacan on 2014. 9. 26..
  */
 public class Bridge {
+
+    public static final int MSG_DAEMON_INIT       = -1;
+    public static final int MSG_DAEMON_CONNECTED  = 0;
+    public static final int MSG_DAEMON_ADBD_ERR   = 1;
+    public static final int MSG_DAEMON_SERVER_ERR = 2;
+    public static final int MSG_DAEMON_DISCONNECT = 3;
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
@@ -61,6 +66,13 @@ public class Bridge {
 
             if (!mServer.isConnected() && !mDaemon.isConnected())
                 mBridgeListener.onBridgeRemoved();
+        }
+    };
+
+    private final Runnable mError = new Runnable() {
+        @Override
+        public void run() {
+            mBridgeListener.onBridgeError(getStatus());
         }
     };
 
@@ -256,7 +268,6 @@ public class Bridge {
         }
 
         private void setStatus(String status) {
-            Log.d("chitacan", status);
             mStatus = status;
             update();
         }
@@ -308,7 +319,10 @@ public class Bridge {
         private InetSocketAddress mLAddr = null;
 
         private int mAdbPort = 0;
-        private String mStatus = null;
+        private int mStatus = MSG_DAEMON_INIT;
+
+        private long mReceive  = 0;
+        private long mTransmit = 0;
 
         DaemonBridge(int adbPort) {
             mAdbPort = adbPort;
@@ -318,24 +332,26 @@ public class Bridge {
         @Override
         public void run() {
             super.run();
-            String result = null;
+            int result = MSG_DAEMON_INIT;
             try {
                 init();
                 connect();
                 loop();
             } catch (ConnectException e) {
-                // adbd connect exception
-                result = "adbd is not available";
+                result = MSG_DAEMON_ADBD_ERR;
                 e.printStackTrace();
             } catch (IOException e) {
+                result = MSG_DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } catch (CancelledKeyException e) {
+                result = MSG_DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } catch (UnresolvedAddressException e) {
                 // no connection. (airplane mode)
+                result = MSG_DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } catch (JSONException e) {
-                result = "JSON parse exception";
+                result = MSG_DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } finally {
                 close(result);
@@ -343,6 +359,8 @@ public class Bridge {
         }
 
         private void init() throws IOException {
+            mReceive  = 0;
+            mTransmit = 0;
             mLAddr = new InetSocketAddress("127.0.0.1", mAdbPort);
             mSelector = Selector.open();
             channel = SocketChannel.open();
@@ -355,7 +373,6 @@ public class Bridge {
         }
 
         private void loop() throws IOException, JSONException {
-            setStatus("daemon loop");
             while(true) {
                 if (this.isInterrupted()) break;
 
@@ -366,8 +383,7 @@ public class Bridge {
                     byte[] data = (byte[]) obj.get("binary");
                     mRBuffer.put(data);
                     mRBuffer.flip();
-                    int write = channel.write(mRBuffer);
-                    setStatus("write : " + write);
+                    mReceive += channel.write(mRBuffer);
                     mRBuffer.clear();
                 }
 
@@ -381,16 +397,16 @@ public class Bridge {
                     if (key.isConnectable()) {
                         if (sc.isConnectionPending()) {
                             sc.finishConnect();
-                            setStatus("daemon connected");
+                            setStatus(MSG_DAEMON_CONNECTED);
                             mMainHandler.post(mCreated);
                             key.interestOps(SelectionKey.OP_READ);
                         }
                     } else if (key.isReadable()) {
                         int read = sc.read(mLBuffer);
-                        setStatus("read : " + read);
                         if (read == -1)
                             return;
                         else {
+                            mTransmit += read;
                             mLBuffer.flip();
                             byte[] b = new byte[mLBuffer.remaining()];
                             mLBuffer.get(b);
@@ -406,9 +422,7 @@ public class Bridge {
             }
         }
 
-        private void close(String msg) {
-            if (msg == null)
-                msg = "daemon close";
+        private void close(int msg) {
             try {
                 if (channel != null)
                     channel.close();
@@ -420,6 +434,10 @@ public class Bridge {
             } catch(IOException e) {
                 e.printStackTrace();
             }
+
+            if (msg == MSG_DAEMON_INIT)
+                msg = MSG_DAEMON_DISCONNECT;
+
             setStatus(msg);
             mMainHandler.post(mRemoved);
         }
@@ -440,8 +458,7 @@ public class Bridge {
             super.interrupt();
         }
 
-        private void setStatus(String status) {
-            Log.d("chitacan", status);
+        private void setStatus(int status) {
             mStatus = status;
             update();
         }
@@ -456,7 +473,7 @@ public class Bridge {
             Bundle bundle = new Bundle();
 
             bundle.putBoolean("daemon_connected", isConnected());
-            bundle.putString("daemon_status", mStatus);
+            bundle.putInt("daemon_status", mStatus);
             return bundle;
         }
     }
@@ -465,7 +482,7 @@ public class Bridge {
         public void onStatusUpdate(Bundle bundle);
         public void onBridgeCreated();
         public void onBridgeRemoved();
-        public void onBridgeError();
+        public void onBridgeError(Bundle bundle);
     }
 
 }
