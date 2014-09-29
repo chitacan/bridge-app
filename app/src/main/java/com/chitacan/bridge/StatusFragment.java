@@ -1,20 +1,8 @@
 package com.chitacan.bridge;
 
 
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.app.Fragment;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.support.v4.app.NavUtils;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,16 +54,6 @@ public class StatusFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mIsBound) {
-            try {
-                Message msg = Message.obtain(null, BridgeService.MSG_STATUS_BRIDGE);
-                msg.setData(getArguments());
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } else
-            bindService();
     }
 
     @Override
@@ -86,7 +64,6 @@ public class StatusFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unbindService();
     }
 
     @Override
@@ -121,73 +98,4 @@ public class StatusFragment extends Fragment {
         mDaemonConnected.setText(bundle.containsKey("daemon_connected") ? String.valueOf(bundle.getBoolean("daemon_connected")) : "");
         mDaemonStatus.setText(bundle.containsKey("daemon_status") ? bundle.getString("daemon_status") : "");
     }
-
-    private boolean mIsBound = false;
-
-    private void bindService() {
-        Intent intent = new Intent(getActivity(), BridgeService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
-    }
-
-    private void unbindService() {
-        if (mIsBound) {
-            if (mService != null) {
-                try {
-                    Message msg = Message.obtain(null, BridgeService.MSG_UNREGISTER_CLIENT);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            getActivity().unbindService(mConnection);
-            mIsBound = false;
-        }
-    }
-
-
-    class Incominghandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case BridgeService.MSG_STATUS_BRIDGE:
-                    Log.d("chtacan", "status fragment - MSG_STATUS_BRIDGE");
-                    update(msg.peekData());
-                    break;
-
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    private Messenger mService;
-    private final Messenger mMessenger = new Messenger(new Incominghandler());
-
-    private final ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = new Messenger(service);
-
-            try {
-                Message msg = Message.obtain(null, BridgeService.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-
-                msg = Message.obtain(null, BridgeService.MSG_STATUS_BRIDGE);
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-        }
-    };
 }

@@ -1,64 +1,17 @@
 package com.chitacan.bridge;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import java.util.ArrayList;
 
 public class BridgeService extends Service {
 
-    static final int MSG_REGISTER_CLIENT   = 0;
-    static final int MSG_UNREGISTER_CLIENT = 1;
-    static final int MSG_CREATE_BRIDGE     = 2;
-    static final int MSG_REMOVE_BRIDGE     = 3;
-    static final int MSG_STATUS_BRIDGE     = 4;
-
-    static final int MSG_BRIDGE_CREATED    = 5;
-    static final int MSG_BRIDGE_REMOVED    = 6;
-
-    class IncomingHandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_REGISTER_CLIENT:
-                    mClients.add(msg.replyTo);
-                    Log.d("chitacan", "register messenger");
-                    break;
-                case MSG_UNREGISTER_CLIENT:
-                    Log.d("chitacan", "unregister messenger");
-                    mClients.remove(msg.replyTo);
-                    break;
-                case MSG_CREATE_BRIDGE:
-                    Log.d("chitacan", "create bridge");
-                    createBridge(msg.getData());
-                    sendToClients(MSG_BRIDGE_CREATED, null);
-                    break;
-                case MSG_REMOVE_BRIDGE:
-                    Log.d("chitacan", "remove bridge");
-                    removeBridge();
-                    sendToClients(MSG_BRIDGE_REMOVED, null);
-                    break;
-                case MSG_STATUS_BRIDGE:
-                    Log.d("chitacan", "MSG_STATUS_BRIDGE");
-                    if (mBridge != null)
-                        sendToClients(msg.what, mBridge.getStatus());
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    private final Messenger mMessenger = new Messenger(new IncomingHandler());
-    private ArrayList<Messenger> mClients = new ArrayList();
     private Bridge mBridge;
 
     public BridgeService() {
@@ -77,12 +30,6 @@ public class BridgeService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        Log.d("chitacan", "onBind");
-        return mMessenger.getBinder();
-    }
-
-    @Override
     public boolean onUnbind(Intent intent) {
         Log.d("chitacan", "onUnBind");
         return super.onUnbind(intent);
@@ -94,18 +41,9 @@ public class BridgeService extends Service {
         super.onDestroy();
     }
 
-    private void sendToClients(int what, Bundle bundle) {
-        Message msg = Message.obtain(null, what);
-        if (bundle != null)
-            msg.setData(bundle);
-
-        for (int i = mClients.size()-1; i >= 0; i--) {
-            try {
-                mClients.get(i).send(msg);
-            } catch (RemoteException e) {
-                mClients.remove(i);
-            }
-        }
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private void createBridge(Bundle bundle) {

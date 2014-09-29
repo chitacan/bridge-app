@@ -3,18 +3,9 @@ package com.chitacan.bridge;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ListFragment;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -117,18 +108,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 NavUtils.navigateUpFromSameTask(getActivity());
                 return true;
             case R.id.action_connect:
-                if (!mIsBound && mService == null)
-                    return true;
-
-                try {
-                    Message msg = Message.obtain(null, BridgeService.MSG_CREATE_BRIDGE);
-                    msg.setData(getArguments());
-                    mService.send(msg);
-
-                    setListShown(false);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -137,7 +116,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public void onResume() {
         super.onResume();
-        bindService();
     }
 
     @Override
@@ -148,7 +126,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unbindService();
     }
 
     @Override
@@ -160,23 +137,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
-        if (mIsBound && mService != null) {
-            RestKit.Client client = (RestKit.Client) l.getItemAtPosition(position);
-
-            Bundle bundle = getArguments();
-            bundle.putString("clientId", client.value);
-
-            try {
-                Message msg = Message.obtain(null, BridgeService.MSG_CREATE_BRIDGE);
-                msg.setData(bundle);
-                mService.send(msg);
-
-                setListShown(false);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
 
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
@@ -240,76 +200,4 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
             return v;
         }
     }
-
-    private boolean mIsBound = false;
-
-    private void bindService() {
-        Intent intent = new Intent(getActivity(), BridgeService.class);
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
-    }
-
-    private void unbindService() {
-        if (mIsBound) {
-            if (mService != null) {
-                try {
-                    Message msg = Message.obtain(null, BridgeService.MSG_UNREGISTER_CLIENT);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            getActivity().unbindService(mConnection);
-            mIsBound = false;
-        }
-    }
-
-
-    class Incominghandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case BridgeService.MSG_STATUS_BRIDGE:
-                    Log.d("chitacan", "MSG_STATUS_BRIDGE");
-                    break;
-
-                case BridgeService.MSG_BRIDGE_CREATED:
-                    Log.d("chitacan", "MSG_BRIDGE_CREATED");
-                    NavUtils.navigateUpFromSameTask(getActivity());
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    private Messenger mService;
-    private final Messenger mMessenger = new Messenger(new Incominghandler());
-
-    private final ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = new Messenger(service);
-
-            try {
-                Message msg = Message.obtain(null, BridgeService.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
-                mService.send(msg);
-
-                msg = Message.obtain(null, BridgeService.MSG_STATUS_BRIDGE);
-                mService.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-        }
-    };
 }
