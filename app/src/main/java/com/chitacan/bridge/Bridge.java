@@ -30,28 +30,54 @@ import java.util.concurrent.ArrayBlockingQueue;
 /**
  * Created by chitacan on 2014. 9. 26..
  */
-public class Bridge implements Runnable{
+public class Bridge {
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
     private Bundle mBridgeInfo;
-    private UpdateListener mUpdateListener;
+    private BridgeListener mBridgeListener;
     private Handler mMainHandler;
+
+    private final Runnable mUpdate = new Runnable() {
+        @Override
+        public void run() {
+            mBridgeListener.onStatusUpdate(getStatus());
+        }
+    };
+
+    private final Runnable mCreated = new Runnable() {
+        @Override
+        public void run() {
+            if (mServer.isConnected() && mDaemon.isConnected())
+                mBridgeListener.onBridgeCreated();
+        }
+    };
+
+    private final Runnable mRemoved = new Runnable() {
+        @Override
+        public void run() {
+            if (mDaemon == null)
+                return;
+
+            if (!mServer.isConnected() && !mDaemon.isConnected())
+                mBridgeListener.onBridgeRemoved();
+        }
+    };
 
     public Bridge() {
         this(null);
     }
 
-    public Bridge(UpdateListener listener) {
-        mUpdateListener = listener;
+    public Bridge(BridgeListener listener) {
+        mBridgeListener = listener;
         mMainHandler = new Handler(Looper.getMainLooper());
     }
 
     private void update() {
-        if (mUpdateListener == null)
+        if (mBridgeListener == null)
             return;
 
-        mMainHandler.post(this);
+        mMainHandler.post(mUpdate);
     }
 
     public void create(Bundle bundle) {
@@ -94,11 +120,6 @@ public class Bridge implements Runnable{
         return bundle;
     }
 
-    @Override
-    public void run() {
-        mUpdateListener.onUpdate(getStatus());
-    }
-
     private class ServerBridge {
 
         private Socket mSocket = null;
@@ -132,6 +153,7 @@ public class Bridge implements Runnable{
                     isConnected = true;
                     mSocket.emit("bd-host", hostInfo());
                     setStatus("server connected");
+                    mMainHandler.post(mCreated);
                 }
 
             }).on("bs-data", new Emitter.Listener() {
@@ -170,6 +192,12 @@ public class Bridge implements Runnable{
                 @Override
                 public void call(Object... args) {
                     setStatus("server reconnecting...");
+                }
+            }).on("bs-collapse", new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                    setStatus("bridge collapsed");
                 }
             });
         }
@@ -212,6 +240,7 @@ public class Bridge implements Runnable{
         public void disconnect() {
             mSocket.close();
             mSocket.disconnect();
+            mMainHandler.post(mRemoved);
         }
 
         public void setDaemon(DaemonBridge bridge) {
@@ -303,7 +332,7 @@ public class Bridge implements Runnable{
             } catch (CancelledKeyException e) {
                 e.printStackTrace();
             } catch (UnresolvedAddressException e) {
-                // no connectiom. (airplane mode)
+                // no connection. (airplane mode)
                 e.printStackTrace();
             } catch (JSONException e) {
                 result = "JSON parse exception";
@@ -353,6 +382,7 @@ public class Bridge implements Runnable{
                         if (sc.isConnectionPending()) {
                             sc.finishConnect();
                             setStatus("daemon connected");
+                            mMainHandler.post(mCreated);
                             key.interestOps(SelectionKey.OP_READ);
                         }
                     } else if (key.isReadable()) {
@@ -391,6 +421,7 @@ public class Bridge implements Runnable{
                 e.printStackTrace();
             }
             setStatus(msg);
+            mMainHandler.post(mRemoved);
         }
 
         public boolean queue(Object obj) {
@@ -415,17 +446,26 @@ public class Bridge implements Runnable{
             update();
         }
 
+        public boolean isConnected() {
+            if (channel == null)
+                return false;
+            return channel.isConnected();
+        }
+
         public Bundle getStatus() {
             Bundle bundle = new Bundle();
 
-            bundle.putBoolean("daemon_connected", channel.isConnected());
+            bundle.putBoolean("daemon_connected", isConnected());
             bundle.putString("daemon_status", mStatus);
             return bundle;
         }
     }
 
-    interface UpdateListener {
-        public void onUpdate(Bundle bundle);
+    interface BridgeListener {
+        public void onStatusUpdate(Bundle bundle);
+        public void onBridgeCreated();
+        public void onBridgeRemoved();
+        public void onBridgeError();
     }
 
 }

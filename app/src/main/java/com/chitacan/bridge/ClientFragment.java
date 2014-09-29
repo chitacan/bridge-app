@@ -149,6 +149,8 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
         bundle.putString("clientId", client.value);
         BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATE, bundle));
 
+        setListShown(false);
+
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
@@ -214,13 +216,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     @Subscribe
     public void bridgeEvent(BridgeEvent event) {
-        if (event.type != BridgeEvent.STATUS) return;
-
-        Bundle b = event.bundle;
-        if (b == null) return;
-
-        if (b.getBoolean("server_connected", false)) {
+        if (event.type == BridgeEvent.CREATED)
             NavUtils.navigateUpFromSameTask(getActivity());
-        }
     }
 }

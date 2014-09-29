@@ -4,12 +4,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-public class BridgeService extends Service implements Bridge.UpdateListener{
+public class BridgeService extends Service implements Bridge.BridgeListener {
 
     private Bridge mBridge;
     private boolean mIsRegistered = false;
@@ -83,8 +82,23 @@ public class BridgeService extends Service implements Bridge.UpdateListener{
     }
 
     @Override
-    public void onUpdate(Bundle bundle) {
+    public void onStatusUpdate(Bundle bundle) {
         BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS, bundle));
+    }
+
+    @Override
+    public void onBridgeCreated() {
+        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATED));
+    }
+
+    @Override
+    public void onBridgeRemoved() {
+        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVED));
+    }
+
+    @Override
+    public void onBridgeError() {
+
     }
 
     @Produce
