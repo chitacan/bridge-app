@@ -97,8 +97,8 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     }
 
     @Override
-    public void onBridgeError() {
-
+    public void onBridgeError(Bundle bundle) {
+        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.ERROR, bundle));
     }
 
     @Produce

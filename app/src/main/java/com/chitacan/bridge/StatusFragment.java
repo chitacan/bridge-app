@@ -3,10 +3,12 @@ package com.chitacan.bridge;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
@@ -98,14 +100,22 @@ public class StatusFragment extends Fragment {
         mClientId.setText(bundle.containsKey("clientId") ? bundle.getString("clientId") : "");
         mServerConneted.setText(bundle.containsKey("server_connected") ? String.valueOf(bundle.getBoolean("server_connected")) : "");
         mServerEndPoint.setText(bundle.containsKey("server_endpoint") ? bundle.getString("server_endpoint") : "");
-        mServerStatus.setText(bundle.containsKey("server_status") ? bundle.getString("server_status") : "");
+        mServerStatus.setText(bundle.containsKey("server_status") ? String.valueOf(bundle.getInt("server_status")) : "");
         mDaemonConnected.setText(bundle.containsKey("daemon_connected") ? String.valueOf(bundle.getBoolean("daemon_connected")) : "");
         mDaemonStatus.setText(bundle.containsKey("daemon_status") ? String.valueOf(bundle.getInt("daemon_status")) : "");
     }
 
     @Subscribe
     public void bridgeEvent(BridgeEvent event) {
-        if (event.type == BridgeEvent.STATUS)
-            update(event.bundle);
+        switch(event.type) {
+            case BridgeEvent.STATUS:
+                update(event.bundle);
+                break;
+            case BridgeEvent.ERROR:
+                // TODO: show error Dialog??
+                Toast.makeText(getActivity(), "Bridge Error", Toast.LENGTH_LONG).show();
+                BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVE));
+                break;
+        }
     }
 }

@@ -220,7 +220,16 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     @Subscribe
     public void bridgeEvent(BridgeEvent event) {
-        if (event.type == BridgeEvent.CREATED)
-            NavUtils.navigateUpFromSameTask(getActivity());
+        switch(event.type) {
+            case BridgeEvent.CREATED:
+                NavUtils.navigateUpFromSameTask(getActivity());
+                break;
+            case BridgeEvent.ERROR:
+                // TODO: show error Dialog??
+                setListShown(true);
+                Toast.makeText(getActivity(), "Bridge Error", Toast.LENGTH_LONG).show();
+                BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVE));
+                break;
+        }
     }
 }

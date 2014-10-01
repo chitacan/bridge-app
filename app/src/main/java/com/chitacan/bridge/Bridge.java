@@ -31,11 +31,19 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class Bridge {
 
-    public static final int MSG_DAEMON_INIT       = -1;
-    public static final int MSG_DAEMON_CONNECTED  = 0;
-    public static final int MSG_DAEMON_ADBD_ERR   = 1;
-    public static final int MSG_DAEMON_SERVER_ERR = 2;
-    public static final int MSG_DAEMON_DISCONNECT = 3;
+    public static final int MSG_DAEMON_ADBD_ERR   = -1;
+    public static final int MSG_DAEMON_SERVER_ERR = -2;
+    public static final int MSG_DAEMON_INIT       = 0;
+    public static final int MSG_DAEMON_CONNECTED  = 1;
+    public static final int MSG_DAEMON_DISCONNECT = 2;
+
+    public static final int MSG_SERVER_ERR        = -1;
+    public static final int MSG_SERVER_TIMEOUT    = -2;
+    public static final int MSG_SERVER_INIT       = 0;
+    public static final int MSG_SERVER_CONNECTED  = 1;
+    public static final int MSG_SERVER_DISCONNECT = 2;
+    public static final int MSG_SERVER_RECONNECT  = 3;
+    public static final int MSG_SERVER_COLLAPSE   = 4;
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
@@ -53,6 +61,9 @@ public class Bridge {
     private final Runnable mCreated = new Runnable() {
         @Override
         public void run() {
+            if (mDaemon == null)
+                return;
+
             if (mServer.isConnected() && mDaemon.isConnected())
                 mBridgeListener.onBridgeCreated();
         }
@@ -90,6 +101,13 @@ public class Bridge {
             return;
 
         mMainHandler.post(mUpdate);
+    }
+
+    private void error() {
+        if (mBridgeListener == null)
+            return;
+
+        mMainHandler.post(mError);
     }
 
     public void create(Bundle bundle) {
@@ -140,7 +158,7 @@ public class Bridge {
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
         private String mClientId = null;
-        private String mStatus = null;
+        private int mStatus = MSG_SERVER_INIT;
 
         public ServerBridge() {
             mOpt.forceNew             = true;
@@ -164,7 +182,7 @@ public class Bridge {
                 public void call(Object... args) {
                     isConnected = true;
                     mSocket.emit("bd-host", hostInfo());
-                    setStatus("server connected");
+                    setStatus(MSG_SERVER_CONNECTED);
                     mMainHandler.post(mCreated);
                 }
 
@@ -181,7 +199,7 @@ public class Bridge {
                 public void call(Object... args) {
                     isConnected = false;
                     String reason = (String) args[0];
-                    setStatus("server disconnected - " + reason);
+                    setStatus(MSG_SERVER_DISCONNECT);
                 }
 
             }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
@@ -190,26 +208,26 @@ public class Bridge {
                 public void call(Object... args) {
                     Exception e = (Exception) args[0];
                     e.printStackTrace();
-                    setStatus("server connect error - " + e.getMessage());
+                    setStatus(MSG_SERVER_ERR);
                 }
 
             }).on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    setStatus("server timeout");
+                    setStatus(MSG_SERVER_TIMEOUT);
                 }
             }).on(Socket.EVENT_RECONNECTING, new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    setStatus("server reconnecting...");
+                    setStatus(MSG_SERVER_RECONNECT);
                 }
             }).on("bs-collapse", new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    setStatus("bridge collapsed");
+                    setStatus(MSG_SERVER_COLLAPSE);
                 }
             });
         }
@@ -250,8 +268,26 @@ public class Bridge {
         }
 
         public void disconnect() {
-            mSocket.close();
+            if (isConnected) {
+                disconnectSocket();
+            } else {
+                // If we try to disconnect socket while connecting, It fails with silence.
+                // Therefore we add another connect callback to disconnect that socket.
+                mSocket.off(Socket.EVENT_CONNECT);
+                mSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+
+                    @Override
+                    public void call(Object... args) {
+                        disconnectSocket();
+                    }
+
+                });
+            }
+        }
+
+        private void disconnectSocket() {
             mSocket.disconnect();
+            mSocket.off();
             mMainHandler.post(mRemoved);
         }
 
@@ -267,9 +303,12 @@ public class Bridge {
             return mSocket;
         }
 
-        private void setStatus(String status) {
+        private void setStatus(int status) {
             mStatus = status;
-            update();
+            if (status >= 0)
+                update();
+            else
+                error();
         }
 
         public String getSocketId() {
@@ -300,7 +339,7 @@ public class Bridge {
 
             bundle.putBoolean("server_connected", isConnected());
             bundle.putString("server_endpoint", mUrl);
-            bundle.putString("server_status", mStatus);
+            bundle.putInt("server_status", mStatus);
             return bundle;
         }
     }
@@ -460,7 +499,10 @@ public class Bridge {
 
         private void setStatus(int status) {
             mStatus = status;
-            update();
+            if (status >= 0)
+                update();
+            else
+                error();
         }
 
         public boolean isConnected() {
