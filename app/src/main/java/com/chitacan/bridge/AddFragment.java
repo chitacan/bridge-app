@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -125,6 +126,7 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         if (item != null ) item.setVisible(false);
 
         ActionBar actionBar = getActivity().getActionBar();
+        actionBar.setIcon(new ColorDrawable(getResources().getColor(android.R.color.transparent)));
         actionBar.setTitle("Add Server");
 
         super.onPrepareOptionsMenu(menu);
