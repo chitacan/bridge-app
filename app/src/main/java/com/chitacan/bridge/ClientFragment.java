@@ -168,8 +168,12 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     @Override
     public void failure(RetrofitError error) {
-        error.printStackTrace();
-        Toast.makeText(getActivity(), "Rest API error", Toast.LENGTH_LONG).show();
+        if (error.isNetworkError())
+            Toast.makeText(getActivity(), "Can't connect to server.", Toast.LENGTH_LONG).show();
+        else {
+            error.printStackTrace();
+            Toast.makeText(getActivity(), "Rest API error", Toast.LENGTH_LONG).show();
+        }
         getListView().postDelayed(new Runnable() {
             @Override
             public void run() {
