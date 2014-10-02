@@ -45,6 +45,7 @@ public class Bridge {
     public static final int MSG_SERVER_DISCONNECT = 2;
     public static final int MSG_SERVER_RECONNECT  = 3;
     public static final int MSG_SERVER_COLLAPSE   = 4;
+    public static final int MSG_SERVER_BRIDGED    = 5;
 
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
@@ -223,6 +224,18 @@ public class Bridge {
                 public void call(Object... args) {
                     setStatus(MSG_SERVER_RECONNECT);
                 }
+            }).on("bs-bridged", new Emitter.Listener() {
+
+                @Override
+                public void call(Object... args) {
+                    try {
+                        JSONObject obj = (JSONObject) args[0];
+                        mClientId = obj.getString("client");
+                        setStatus(MSG_SERVER_BRIDGED);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }).on("bs-collapse", new Emitter.Listener() {
 
                 @Override
@@ -340,6 +353,7 @@ public class Bridge {
             bundle.putBoolean("server_connected", isConnected());
             bundle.putString("server_endpoint", mUrl);
             bundle.putInt("server_status", mStatus);
+            bundle.putString("clientId", mClientId);
             return bundle;
         }
     }
