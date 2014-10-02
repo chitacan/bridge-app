@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -49,41 +50,41 @@ public class Bridge {
     private DaemonBridge mDaemon = null;
     private Bundle mBridgeInfo;
     private BridgeListener mBridgeListener;
-    private Handler mMainHandler;
 
-    private final Runnable mUpdate = new Runnable() {
+    private static final int MSG_CREATE = 0;
+    private static final int MSG_UPDATE = 1;
+    private static final int MSG_REMOVE = 2;
+    private static final int MSG_ERROR  = 3;
+
+    private final Handler mMainHandler = new Handler(Looper.getMainLooper()) {
+
         @Override
-        public void run() {
-            mBridgeListener.onStatusUpdate(getStatus());
-        }
-    };
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_CREATE:
+                    if (mDaemon == null) return;
 
-    private final Runnable mCreated = new Runnable() {
-        @Override
-        public void run() {
-            if (mDaemon == null)
-                return;
+                    if (mServer.isConnected() && mDaemon.isConnected())
+                        mBridgeListener.onBridgeCreated();
 
-            if (mServer.isConnected() && mDaemon.isConnected())
-                mBridgeListener.onBridgeCreated();
-        }
-    };
+                    break;
 
-    private final Runnable mRemoved = new Runnable() {
-        @Override
-        public void run() {
-            if (mDaemon == null)
-                return;
+                case MSG_UPDATE:
+                    mBridgeListener.onStatusUpdate(getStatus());
+                    break;
 
-            if (!mServer.isConnected() && !mDaemon.isConnected())
-                mBridgeListener.onBridgeRemoved();
-        }
-    };
+                case MSG_REMOVE:
+                    if (mDaemon == null) return;
 
-    private final Runnable mError = new Runnable() {
-        @Override
-        public void run() {
-            mBridgeListener.onBridgeError(getStatus());
+                    if (!mServer.isConnected() && !mDaemon.isConnected())
+                        mBridgeListener.onBridgeRemoved();
+
+                    break;
+
+                case MSG_ERROR:
+                    mBridgeListener.onBridgeError(getStatus());
+                    break;
+            }
         }
     };
 
@@ -93,21 +94,20 @@ public class Bridge {
 
     public Bridge(BridgeListener listener) {
         mBridgeListener = listener;
-        mMainHandler = new Handler(Looper.getMainLooper());
     }
 
     private void update() {
         if (mBridgeListener == null)
             return;
 
-        mMainHandler.post(mUpdate);
+        mMainHandler.sendEmptyMessage(MSG_UPDATE);
     }
 
     private void error() {
         if (mBridgeListener == null)
             return;
 
-        mMainHandler.post(mError);
+        mMainHandler.sendEmptyMessage(MSG_ERROR);
     }
 
     public void create(Bundle bundle) {
@@ -183,7 +183,7 @@ public class Bridge {
                     isConnected = true;
                     mSocket.emit("bd-host", hostInfo());
                     setStatus(MSG_SERVER_CONNECTED);
-                    mMainHandler.post(mCreated);
+                    mMainHandler.sendEmptyMessage(MSG_CREATE);
                 }
 
             }).on("bs-data", new Emitter.Listener() {
@@ -288,7 +288,7 @@ public class Bridge {
         private void disconnectSocket() {
             mSocket.disconnect();
             mSocket.off();
-            mMainHandler.post(mRemoved);
+            mMainHandler.sendEmptyMessage(MSG_REMOVE);
         }
 
         public void setDaemon(DaemonBridge bridge) {
@@ -437,7 +437,7 @@ public class Bridge {
                         if (sc.isConnectionPending()) {
                             sc.finishConnect();
                             setStatus(MSG_DAEMON_CONNECTED);
-                            mMainHandler.post(mCreated);
+                            mMainHandler.sendEmptyMessage(MSG_CREATE);
                             key.interestOps(SelectionKey.OP_READ);
                         }
                     } else if (key.isReadable()) {
@@ -478,7 +478,7 @@ public class Bridge {
                 msg = MSG_DAEMON_DISCONNECT;
 
             setStatus(msg);
-            mMainHandler.post(mRemoved);
+            mMainHandler.sendEmptyMessage(MSG_REMOVE);
         }
 
         public boolean queue(Object obj) {
@@ -526,5 +526,4 @@ public class Bridge {
         public void onBridgeRemoved();
         public void onBridgeError(Bundle bundle);
     }
-
 }
