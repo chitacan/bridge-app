@@ -59,6 +59,11 @@ Bridge.prototype.install = function(ids) {
   var skt = this.getSocketById(ids);
   setBridgeId(skt, ids);
 
+  if (skt.daemon && skt.client) {
+    skt.daemon.emit('bs-bridged', ids);
+    skt.client.emit('bs-bridged', ids);
+  }
+
   if (skt.daemon && this.cache) {
     skt.daemon.emit('bs-data', this.cache);
     this.cache = '';
