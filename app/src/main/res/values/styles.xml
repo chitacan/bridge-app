@@ -6,6 +6,8 @@
         <item name="android:actionBarStyle">@style/BridgeActionBar</item>
         <item name="android:actionMenuTextColor">@color/actionbar_textcolor</item>
         <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
+        <item name="android:textAppearanceListItem">@style/primaryText</item>
+        <item name="android:textAppearanceSmall">@style/secondaryText</item>
     </style>
 
     <!-- ActionBar styles -->
@@ -16,6 +18,16 @@
 
     <style name="OverFlow" parent="@android:style/Widget.Holo.Light.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_overflow</item>
+    </style>
+
+    <style name="primaryText">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="secondaryText" parent="@android:style/TextAppearance.Holo.Small">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>
