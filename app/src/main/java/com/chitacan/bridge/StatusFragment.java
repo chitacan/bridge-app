@@ -2,15 +2,19 @@ package com.chitacan.bridge;
 
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
+
+import java.util.ArrayList;
 
 
 /**
@@ -20,16 +24,37 @@ import com.squareup.otto.Subscribe;
  *
  */
 public class StatusFragment extends Fragment {
-    private TextView mAdbPort;
-    private TextView mName;
-    private TextView mHost;
-    private TextView mPort;
-    private TextView mClientId;
-    private TextView mServerConneted;
-    private TextView mServerEndPoint;
-    private TextView mServerStatus;
-    private TextView mDaemonConnected;
-    private TextView mDaemonStatus;
+
+    private class Item {
+        String type;
+        String title;
+        String value;
+        String key;
+
+        public Item(String type, String title) {
+            this(type, title, null);
+        }
+
+        public Item(String type, String title, String value) {
+            this(type, title, value, null);
+        }
+
+        public Item(String type, String title, String value, String key) {
+            this.type = type;
+            this.title = title;
+            this.value= value;
+            this.key = key;
+        }
+
+        public boolean isHeader() {
+            if (type == null) return false;
+            if (type.equals("header")) return true;
+
+            return false;
+        }
+    }
+
+    private final ArrayList<Item> mList = new ArrayList<Item> ();
 
     /**
      * Use this factory method to create a new instance of
@@ -53,6 +78,18 @@ public class StatusFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+
+        mList.add(new Item("header", "Daemon"));
+        mList.add(new Item(null, "ADBD port", null, "adbport"));
+        mList.add(new Item(null, "Status", null, "daemon_status"));
+        mList.add(new Item(null, "connected", null, "daemon_connected"));
+
+        mList.add(new Item("header", "Server"));
+        mList.add(new Item(null, "Name", null, "name"));
+        mList.add(new Item(null, "Endpoint", null, "server_endpoint"));
+        mList.add(new Item(null, "Status", null, "server_status"));
+        mList.add(new Item(null, "connected", null, "server_connected"));
+        mList.add(new Item(null, "client ID", null, "clientId"));
     }
 
     @Override
@@ -76,16 +113,8 @@ public class StatusFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_status, container, false);
-        mAdbPort         = (TextView) v.findViewById(R.id.status_adbport);
-        mName            = (TextView) v.findViewById(R.id.status_name);
-        mHost            = (TextView) v.findViewById(R.id.status_host);
-        mPort            = (TextView) v.findViewById(R.id.status_port);
-        mClientId        = (TextView) v.findViewById(R.id.status_clientid);
-        mServerConneted  = (TextView) v.findViewById(R.id.status_server_connected);
-        mServerEndPoint  = (TextView) v.findViewById(R.id.status_server_endpoint);
-        mServerStatus    = (TextView) v.findViewById(R.id.status_server);
-        mDaemonConnected = (TextView) v.findViewById(R.id.status_daemon_connected);
-        mDaemonStatus    = (TextView) v.findViewById(R.id.status_daemon);
+        ListView lv = (ListView) v.findViewById(R.id.status);
+        lv.setAdapter(new StatusListAdapter(getActivity()));
         return v;
     }
 
@@ -93,16 +122,11 @@ public class StatusFragment extends Fragment {
         if (bundle == null)
             return;
 
-        mAdbPort.setText(bundle.containsKey("adbport") ? String.valueOf(bundle.getInt("adbport")) : "");
-        mName.setText(bundle.containsKey("name") ? bundle.getString("name") : "");
-        mHost.setText(bundle.containsKey("host") ? bundle.getString("host") : "");
-        mPort.setText(bundle.containsKey("port") ? String.valueOf(bundle.getInt("port")) : "");
-        mClientId.setText(bundle.containsKey("clientId") ? bundle.getString("clientId") : "");
-        mServerConneted.setText(bundle.containsKey("server_connected") ? String.valueOf(bundle.getBoolean("server_connected")) : "");
-        mServerEndPoint.setText(bundle.containsKey("server_endpoint") ? bundle.getString("server_endpoint") : "");
-        mServerStatus.setText(bundle.containsKey("server_status") ? String.valueOf(bundle.getInt("server_status")) : "");
-        mDaemonConnected.setText(bundle.containsKey("daemon_connected") ? String.valueOf(bundle.getBoolean("daemon_connected")) : "");
-        mDaemonStatus.setText(bundle.containsKey("daemon_status") ? String.valueOf(bundle.getInt("daemon_status")) : "");
+        for (Item item : mList) {
+            if (item.key == null) continue;
+
+            item.value = String.valueOf(bundle.get(item.key));
+        }
     }
 
     @Subscribe
@@ -116,6 +140,70 @@ public class StatusFragment extends Fragment {
                 Toast.makeText(getActivity(), "Bridge Error", Toast.LENGTH_LONG).show();
                 BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVE));
                 break;
+        }
+    }
+
+    private class StatusListAdapter extends BaseAdapter {
+
+        private final LayoutInflater mInflater;
+
+        public StatusListAdapter(Context context) {
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount() {
+            return mList.size();
+        }
+
+        @Override
+        public boolean isEnabled(int position) {
+            return !mList.get(position).isHeader();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Item item = mList.get(position);
+            boolean isHeader = item.isHeader();
+            convertView = getConvertView(convertView, parent, isHeader);
+
+            if (isHeader) {
+                TextView title = (TextView) convertView.findViewById(R.id.lv_list_hdr);
+                title.setText(item.title);
+            } else {
+                TextView title = (TextView) convertView.findViewById(R.id.lv_item_header);
+                TextView desc  = (TextView) convertView.findViewById(R.id.lv_item_subtext);
+
+                title.setText(item.title);
+                desc.setText(item.value);
+            }
+
+            return convertView;
+        }
+
+        private View getConvertView(View convertView, ViewGroup parent, boolean isHeader) {
+            int layout = isHeader ? R.layout.lv_header : R.layout.lv_item;
+            if (convertView == null)
+                return mInflater.inflate(layout, parent, false);
+
+            boolean inflateNew = isHeader
+                    ? (convertView.getId() == R.id.item)
+                    : (convertView.getId() == R.id.header);
+
+            if (inflateNew)
+                return mInflater.inflate(layout, parent, false);
+
+            return convertView;
         }
     }
 }
