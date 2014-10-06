@@ -42,16 +42,12 @@
     </style>
 
     <style name="listViewPrimaryDetail">
-        <item name="android:paddingTop">@dimen/lvPrimaryPaddingTop</item>
-        <item name="android:paddingBottom">@dimen/lvPrimaryPaddingBottom</item>
         <item name="android:paddingLeft">@dimen/lvPrimaryPaddingLeft</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:textSize">@dimen/lvPrimaryTextSize</item>
     </style>
 
     <style name="listViewSecondaryDetail">
-        <item name="android:paddingTop">@dimen/lvSecondaryPaddingTop</item>
-        <item name="android:paddingBottom">@dimen/lvSecondaryPaddingBottom</item>
         <item name="android:paddingLeft">@dimen/lvSecondaryPaddingLeft</item>
         <item name="android:textColor">@color/secondaryTextColor</item>
         <item name="android:textSize">@dimen/lvSecondaryTextSize</item>

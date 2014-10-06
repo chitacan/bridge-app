@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/listViewItem"
     android:id="@+id/item"
+    style="@style/listViewItem"
     android:layout_width="match_parent"
     android:background="?android:attr/selectableItemBackground"
     tools:context=".MainActivity">
@@ -16,9 +16,9 @@
     <TextView
         android:id="@+id/lv_item_header"
         style="@style/listViewPrimaryDetail"
-        android:layout_width="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:textIsSelectable="false" />
 
     <ImageButton
@@ -38,12 +38,11 @@
     <TextView
         android:id="@+id/lv_item_subtext"
         style="@style/listViewSecondaryDetail"
+        android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/item_separator"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/lv_item_header"
-        android:layout_toLeftOf="@id/vertical_divider"
+        android:layout_alignBottom="@id/lv_item_header"
+        android:layout_toRightOf="@id/lv_item_header"
         android:ellipsize="marquee"
         android:singleLine="true"
         android:textIsSelectable="false" />

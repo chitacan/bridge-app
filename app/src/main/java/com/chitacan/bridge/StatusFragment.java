@@ -30,20 +30,26 @@ public class StatusFragment extends Fragment {
         String title;
         String value;
         String key;
+        boolean hasPref = false;
 
         public StatusItem(String type, String title) {
             this(type, title, null);
         }
 
         public StatusItem(String type, String title, String value) {
-            this(type, title, value, null);
+            this(type, title, value, null, false);
         }
 
         public StatusItem(String type, String title, String value, String key) {
+            this(type, title, value, key, false);
+        }
+
+        public StatusItem(String type, String title, String value, String key, boolean hasPref) {
             this.type = type;
             this.title = title;
             this.value= value;
             this.key = key;
+            this.hasPref = hasPref;
         }
 
         public boolean isHeader() {
@@ -80,7 +86,7 @@ public class StatusFragment extends Fragment {
         }
 
         mList.add(new StatusItem("header", "Daemon"));
-        mList.add(new StatusItem(null, "ADBD port", null, "adbport"));
+        mList.add(new StatusItem(null, "ADBD port", null, "adbport", true));
         mList.add(new StatusItem(null, "Status", null, "daemon_status"));
         mList.add(new StatusItem(null, "connected", null, "daemon_connected"));
 
@@ -183,9 +189,13 @@ public class StatusFragment extends Fragment {
             } else {
                 TextView title = (TextView) convertView.findViewById(R.id.lv_item_header);
                 TextView desc  = (TextView) convertView.findViewById(R.id.lv_item_subtext);
+                View pref = convertView.findViewById(R.id.button);
+                View divider = convertView.findViewById(R.id.vertical_divider);
 
                 title.setText(item.title);
                 desc.setText(item.value);
+                pref.setVisibility(item.hasPref ? View.VISIBLE : View.GONE);
+                divider.setVisibility(item.hasPref ? View.VISIBLE : View.GONE);
             }
 
             return convertView;

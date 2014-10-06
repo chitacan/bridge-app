@@ -10,8 +10,8 @@
     <dimen name="lvPrimaryTextSize">18sp</dimen>
     <dimen name="lvSecondaryTextSize">14sp</dimen>
 
-    <dimen name="lvHdrItemHeight">45dp</dimen>
-    <dimen name="lvItemHeight">65dp</dimen>
+    <dimen name="lvHdrItemHeight">40dp</dimen>
+    <dimen name="lvItemHeight">50dp</dimen>
 
     <dimen name="lvHeadingPaddingLeft">8dp</dimen>
     <dimen name="lvHeadingTextSize">14sp</dimen>
