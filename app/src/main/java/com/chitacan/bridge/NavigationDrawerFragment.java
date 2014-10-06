@@ -30,6 +30,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
@@ -160,6 +162,18 @@ public class NavigationDrawerFragment
         });
         mDrawerListView.setAdapter(mAdapter);
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        BusProvider.getInstance().register(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        BusProvider.getInstance().unregister(this);
+        super.onPause();
     }
 
     public boolean isDrawerOpen() {
@@ -351,6 +365,20 @@ public class NavigationDrawerFragment
         void onNavigationDrawerItemSelected(Bundle bundle);
     }
 
+    @Subscribe
+    public void bridgeEvent(BridgeEvent event) {
+        if (event.type != BridgeEvent.STATUS) return;
+
+        if (event.bundle == null) {
+            mDrawerLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mDrawerLayout.openDrawer(mFragmentContainerView);
+                }
+            }, 1000);
+        } else
+            mDrawerLayout.closeDrawers();
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
