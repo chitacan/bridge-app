@@ -2,19 +2,20 @@ package com.chitacan.bridge;
 
 
 import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  *
  */
-public class StatusFragment extends Fragment {
+public class StatusFragment extends ListFragment {
 
     private class StatusItem {
         String type;
@@ -60,7 +61,8 @@ public class StatusFragment extends Fragment {
         }
     }
 
-    private final ArrayList<StatusItem> mList = new ArrayList<StatusItem> ();
+    private StatusListAdapter mAdapter;
+    private ArrayList<StatusItem> mList = new ArrayList<StatusItem>();
 
     /**
      * Use this factory method to create a new instance of
@@ -85,6 +87,7 @@ public class StatusFragment extends Fragment {
         if (getArguments() != null) {
         }
 
+        mList.clear();
         mList.add(new StatusItem("header", "Daemon"));
         mList.add(new StatusItem(null, "ADBD port", null, "adbport", true));
         mList.add(new StatusItem(null, "Status", null, "daemon_status"));
@@ -96,10 +99,19 @@ public class StatusFragment extends Fragment {
         mList.add(new StatusItem(null, "Status", null, "server_status"));
         mList.add(new StatusItem(null, "connected", null, "server_connected"));
         mList.add(new StatusItem(null, "client ID", null, "clientId"));
+
+        mAdapter = new StatusListAdapter(getActivity(), mList);
+        setListAdapter(mAdapter);
     }
 
     @Override
     public void onResume() {
+        setListShown(false);
+        getListView().setDivider(null);
+        int side= (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        getView().setPadding(side, 0, side, 0);
+        setEmptyText("No bridge connection :(");
+
         BusProvider.getInstance().register(this);
         super.onResume();
     }
@@ -115,24 +127,23 @@ public class StatusFragment extends Fragment {
         super.onDestroy();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_status, container, false);
-        ListView lv = (ListView) v.findViewById(R.id.status);
-        lv.setAdapter(new StatusListAdapter(getActivity()));
-        return v;
-    }
-
     private void update(Bundle bundle) {
-        if (bundle == null)
+        if (bundle == null) {
+            mAdapter.clear();
             return;
+        }
 
-        for (StatusItem item : mList) {
+        if (mAdapter.getCount() == 0)
+            mAdapter.addAll(mList);
+
+        StatusItem item;
+        for (int i = 0 ; i < mAdapter.getCount() ; i++) {
+            item = mAdapter.getItem(i);
             if (item.key == null) continue;
 
             item.value = String.valueOf(bundle.get(item.key));
         }
+        mAdapter.notifyDataSetChanged();
     }
 
     @Subscribe
@@ -140,6 +151,7 @@ public class StatusFragment extends Fragment {
         switch(event.type) {
             case BridgeEvent.STATUS:
                 update(event.bundle);
+                setListShown(true);
                 break;
             case BridgeEvent.ERROR:
                 // TODO: show error Dialog??
@@ -149,32 +161,18 @@ public class StatusFragment extends Fragment {
         }
     }
 
-    private class StatusListAdapter extends BaseAdapter {
+    private class StatusListAdapter extends ArrayAdapter<StatusItem> {
 
         private final LayoutInflater mInflater;
 
-        public StatusListAdapter(Context context) {
+        public StatusListAdapter(Context context, List<StatusItem> objects) {
+            super(context, 0, objects);
             mInflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public int getCount() {
-            return mList.size();
         }
 
         @Override
         public boolean isEnabled(int position) {
             return !mList.get(position).isHeader();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return position;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
         }
 
         @Override
