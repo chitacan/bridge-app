@@ -25,21 +25,21 @@ import java.util.ArrayList;
  */
 public class StatusFragment extends Fragment {
 
-    private class Item {
+    private class StatusItem {
         String type;
         String title;
         String value;
         String key;
 
-        public Item(String type, String title) {
+        public StatusItem(String type, String title) {
             this(type, title, null);
         }
 
-        public Item(String type, String title, String value) {
+        public StatusItem(String type, String title, String value) {
             this(type, title, value, null);
         }
 
-        public Item(String type, String title, String value, String key) {
+        public StatusItem(String type, String title, String value, String key) {
             this.type = type;
             this.title = title;
             this.value= value;
@@ -54,7 +54,7 @@ public class StatusFragment extends Fragment {
         }
     }
 
-    private final ArrayList<Item> mList = new ArrayList<Item> ();
+    private final ArrayList<StatusItem> mList = new ArrayList<StatusItem> ();
 
     /**
      * Use this factory method to create a new instance of
@@ -79,17 +79,17 @@ public class StatusFragment extends Fragment {
         if (getArguments() != null) {
         }
 
-        mList.add(new Item("header", "Daemon"));
-        mList.add(new Item(null, "ADBD port", null, "adbport"));
-        mList.add(new Item(null, "Status", null, "daemon_status"));
-        mList.add(new Item(null, "connected", null, "daemon_connected"));
+        mList.add(new StatusItem("header", "Daemon"));
+        mList.add(new StatusItem(null, "ADBD port", null, "adbport"));
+        mList.add(new StatusItem(null, "Status", null, "daemon_status"));
+        mList.add(new StatusItem(null, "connected", null, "daemon_connected"));
 
-        mList.add(new Item("header", "Server"));
-        mList.add(new Item(null, "Name", null, "name"));
-        mList.add(new Item(null, "Endpoint", null, "server_endpoint"));
-        mList.add(new Item(null, "Status", null, "server_status"));
-        mList.add(new Item(null, "connected", null, "server_connected"));
-        mList.add(new Item(null, "client ID", null, "clientId"));
+        mList.add(new StatusItem("header", "Server"));
+        mList.add(new StatusItem(null, "Name", null, "name"));
+        mList.add(new StatusItem(null, "Endpoint", null, "server_endpoint"));
+        mList.add(new StatusItem(null, "Status", null, "server_status"));
+        mList.add(new StatusItem(null, "connected", null, "server_connected"));
+        mList.add(new StatusItem(null, "client ID", null, "clientId"));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class StatusFragment extends Fragment {
         if (bundle == null)
             return;
 
-        for (Item item : mList) {
+        for (StatusItem item : mList) {
             if (item.key == null) continue;
 
             item.value = String.valueOf(bundle.get(item.key));
@@ -173,7 +173,7 @@ public class StatusFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Item item = mList.get(position);
+            StatusItem item = mList.get(position);
             boolean isHeader = item.isHeader();
             convertView = getConvertView(convertView, parent, isHeader);
 
