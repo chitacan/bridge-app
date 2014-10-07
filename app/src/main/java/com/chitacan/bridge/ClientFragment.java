@@ -210,16 +210,17 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View v = LayoutInflater.from(getActivity()).inflate(android.R.layout.simple_list_item_2, null);
+            if (convertView == null)
+                convertView = LayoutInflater.from(getActivity()).inflate(R.layout.lv_client_item, null);
 
-            TextView name  = (TextView) v.findViewById(android.R.id.text1);
-            TextView value = (TextView) v.findViewById(android.R.id.text2);
+            TextView name  = (TextView) convertView.findViewById(R.id.lv_item_name);
+            TextView value = (TextView) convertView.findViewById(R.id.lv_item_id);
 
             RestKit.Client client = getItem(position);
-            name .setText(client.name);
+            name .setText(client.hostInfo.hostname);
             value.setText(client.value);
 
-            return v;
+            return convertView;
         }
     }
 
