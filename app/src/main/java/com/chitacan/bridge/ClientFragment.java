@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -213,14 +214,27 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
             if (convertView == null)
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.lv_client_item, parent, false);
 
-            TextView name  = (TextView) convertView.findViewById(R.id.lv_item_name);
-            TextView value = (TextView) convertView.findViewById(R.id.lv_item_id);
+            TextView  name  = (TextView)  convertView.findViewById(R.id.lv_item_name);
+            TextView  value = (TextView)  convertView.findViewById(R.id.lv_item_id);
+            ImageView icon  = (ImageView) convertView.findViewById(R.id.lv_item_icon);
 
             RestKit.Client client = getItem(position);
+
             name .setText(client.hostInfo.hostname);
             value.setText(client.value);
+            icon .setImageResource(getIconId(client.hostInfo.type));
 
             return convertView;
+        }
+
+        private int getIconId(String type) {
+            if (type.startsWith("Darwin"))
+                return R.drawable.ic_fa_apple;
+
+            if (type.startsWith("Windows"))
+                return R.drawable.ic_fa_windows;
+
+            return R.drawable.ic_fa_linux;
         }
     }
 

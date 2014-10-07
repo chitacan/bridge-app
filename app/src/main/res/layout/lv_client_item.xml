@@ -7,6 +7,8 @@
     tools:context=".ClientActivity">
 
     <ImageView
+        android:id="@+id/lv_item_icon"
+        android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -15,6 +17,7 @@
         style="@style/listViewPrimaryDetail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/lv_item_icon"
         android:paddingTop="@dimen/lvPrimaryPaddingTop"
         android:paddingBottom="@dimen/lvPrimaryPaddingBottom"
         android:singleLine="true"
@@ -26,6 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/lv_item_name"
+        android:layout_toRightOf="@id/lv_item_icon"
         android:paddingTop="@dimen/lvSecondaryPaddingTop"
         android:paddingBottom="@dimen/lvSecondaryPaddingBottom"
         android:ellipsize="marquee"
