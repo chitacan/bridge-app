@@ -11,7 +11,8 @@
     <dimen name="lvSecondaryTextSize">14sp</dimen>
 
     <dimen name="lvHdrItemHeight">40dp</dimen>
-    <dimen name="lvItemHeight">50dp</dimen>
+    <dimen name="lvStatusItemHeight">50dp</dimen>
+    <dimen name="lvClientItemHeight">65dp</dimen>
 
     <dimen name="lvHeadingPaddingLeft">8dp</dimen>
     <dimen name="lvHeadingTextSize">14sp</dimen>

@@ -1,16 +1,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item"
-    style="@style/listViewItem"
+    style="@style/lvClientItem"
     android:layout_width="match_parent"
     android:background="?android:attr/selectableItemBackground"
     tools:context=".ClientActivity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/lv_item_name"
         style="@style/listViewPrimaryDetail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/lvPrimaryPaddingTop"
+        android:paddingBottom="@dimen/lvPrimaryPaddingBottom"
         android:singleLine="true"
         android:textIsSelectable="false" />
 
@@ -20,6 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/lv_item_name"
+        android:paddingTop="@dimen/lvSecondaryPaddingTop"
+        android:paddingBottom="@dimen/lvSecondaryPaddingBottom"
         android:ellipsize="marquee"
         android:singleLine="true"
         android:textIsSelectable="false" />
