@@ -39,11 +39,13 @@ Bridge.prototype.get = function() {
     var client = {
       id        : sktc.id,
       connected : sktc.clientConnected,
-      host      : sktc.hostInfo.hostname
+      name      : sktc.hostInfo.hostname,
+      hostInfo  : sktc.hostInfo
     }
     var daemon = {
-      id   : sktd.id,
-      host : sktd.hostInfo.model + ' ' + sktd.hostInfo.version
+      id       : sktd.id,
+      name     : sktd.hostInfo.model + ' ' + sktd.hostInfo.version,
+      hostInfo : sktd.hostInfo
     }
 
     return {
@@ -98,8 +100,9 @@ Bridge.prototype.getSocketByNsp = function(namespace) {
   .map(function(val) {
     var host = !!val.hostInfo ? val.hostInfo.toString() : 'unknown';
     return {
-      name  : val.hostInfo.toString(),
-      value : val.id
+      name     : val.hostInfo.toString(),
+      value    : val.id,
+      hostInfo : val.hostInfo
     }
   })
   .valueOf();
