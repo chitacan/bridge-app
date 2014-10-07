@@ -200,7 +200,7 @@ public class StatusFragment extends ListFragment {
         }
 
         private View getConvertView(View convertView, ViewGroup parent, boolean isHeader) {
-            int layout = isHeader ? R.layout.lv_header : R.layout.lv_item;
+            int layout = isHeader ? R.layout.lv_status_header : R.layout.lv_status_item;
             if (convertView == null)
                 return mInflater.inflate(layout, parent, false);
 
