@@ -121,6 +121,9 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
     @Override
     public void onResume() {
+        int top  = (int) getResources().getDimension(R.dimen.lvPrimaryPaddingTop);
+        int side = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        getView().setPadding(side, top, side, 0);
         BusProvider.getInstance().register(this);
         super.onResume();
     }
