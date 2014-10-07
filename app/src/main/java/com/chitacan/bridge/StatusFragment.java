@@ -6,6 +6,9 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -102,6 +105,7 @@ public class StatusFragment extends ListFragment {
 
         mAdapter = new StatusListAdapter(getActivity(), mList);
         setListAdapter(mAdapter);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -127,9 +131,17 @@ public class StatusFragment extends ListFragment {
         super.onDestroy();
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_disconnect);
+        if (mAdapter.getCount() == 0 && item != null)
+            item.setVisible(false);
+        super.onPrepareOptionsMenu(menu);
+    }
+
     private void update(Bundle bundle) {
         if (bundle == null) {
-            mAdapter.clear();
+            showDisconnectStatus();
             return;
         }
 
@@ -146,12 +158,18 @@ public class StatusFragment extends ListFragment {
         mAdapter.notifyDataSetChanged();
     }
 
+    private void showDisconnectStatus() {
+        if (mAdapter != null)
+            mAdapter.clear();
+    }
+
     @Subscribe
     public void bridgeEvent(BridgeEvent event) {
         switch(event.type) {
             case BridgeEvent.STATUS:
                 update(event.bundle);
                 setListShown(true);
+                getActivity().invalidateOptionsMenu();
                 break;
             case BridgeEvent.ERROR:
                 // TODO: show error Dialog??
