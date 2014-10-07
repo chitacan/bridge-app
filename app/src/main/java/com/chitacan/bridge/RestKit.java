@@ -21,10 +21,18 @@ public class RestKit {
     static class Client {
         public String name;
         public String value;
+        public HostInfo hostInfo;
     }
 
     static class Response {
         public String result;
+    }
+
+    static class HostInfo {
+        public String type;
+        public String arch;
+        public String hostname;
+        public String version;
     }
 
     public interface BridgeAPI {
@@ -42,5 +50,4 @@ public class RestKit {
         List<Client> removeBridge(@Field("client") String client, @Field("daemon") String daemon);
 
     }
-
 }
