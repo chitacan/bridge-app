@@ -7,6 +7,9 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,9 +95,18 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.client, menu);
 
+        String prefix = getString(R.string.title_client_prefix);
+        Spannable title = new SpannableString(prefix + mServerName);
+        title.setSpan(
+                new ForegroundColorSpan(getResources().getColor(R.color.secondaryTextColor)),
+                0,
+                prefix.length(),
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        );
+
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setIcon(new ColorDrawable(getResources().getColor(android.R.color.transparent)));
-        actionBar.setTitle(mServerName);
+        actionBar.setTitle(title);
         actionBar.setDisplayHomeAsUpEnabled(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
