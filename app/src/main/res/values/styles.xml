@@ -9,6 +9,7 @@
         <item name="android:textAppearanceListItem">@style/primaryText</item>
         <item name="android:textAppearanceSmall">@style/secondaryText</item>
         <item name="android:actionBarItemBackground">@drawable/actionbar_item_selector</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_action_back</item>
     </style>
 
     <!-- ActionBar styles -->
