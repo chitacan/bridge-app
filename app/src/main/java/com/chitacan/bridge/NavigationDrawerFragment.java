@@ -375,7 +375,7 @@ public class NavigationDrawerFragment
                 public void run() {
                     mDrawerLayout.openDrawer(mFragmentContainerView);
                 }
-            }, 1000);
+            }, 500);
         } else
             mDrawerLayout.closeDrawers();
     }
