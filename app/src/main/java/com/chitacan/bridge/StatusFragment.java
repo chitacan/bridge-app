@@ -137,6 +137,17 @@ public class StatusFragment extends ListFragment {
         super.onPrepareOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_disconnect:
+                setListShown(false);
+                BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVE));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void update(Bundle bundle) {
         if (bundle == null) {
             showDisconnectStatus();
@@ -175,6 +186,12 @@ public class StatusFragment extends ListFragment {
         switch(event.type) {
             case BridgeEvent.STATUS:
                 update(event.bundle);
+                openDrawerIfNeeded();
+                setListShown(true);
+                getActivity().invalidateOptionsMenu();
+                break;
+            case BridgeEvent.REMOVED:
+                update(null);
                 openDrawerIfNeeded();
                 setListShown(true);
                 getActivity().invalidateOptionsMenu();

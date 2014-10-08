@@ -75,9 +75,7 @@ public class Bridge {
                     break;
 
                 case MSG_REMOVE:
-                    if (mDaemon == null) return;
-
-                    if (!mServer.isConnected() && !mDaemon.isConnected())
+                    if (!mServer.isConnected() && mDaemon == null)
                         mBridgeListener.onBridgeRemoved();
 
                     break;
@@ -301,6 +299,7 @@ public class Bridge {
         private void disconnectSocket() {
             mSocket.disconnect();
             mSocket.off();
+            isConnected = false;
             mMainHandler.sendEmptyMessage(MSG_REMOVE);
         }
 
