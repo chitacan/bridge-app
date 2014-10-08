@@ -24,8 +24,7 @@
             android:authorities="com.chitacan.bridge" />
 
         <activity
-            android:name=".ClientActivity"
-            android:label="@string/title_activity_client" >
+            android:name=".ClientActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

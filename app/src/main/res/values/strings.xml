@@ -2,18 +2,13 @@
 <resources>
 
     <string name="app_name">Bridge</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_add">Add server info</string>
     <string name="action_disconnect">Disconnect</string>
     <string name="action_settings">Settings</string>
     <string name="action_connect">Connect</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_client">ClientActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="title_client_prefix">Server:</string>
     <string name="menu_edit">Edit selected server</string>
     <string name="menu_remove">Remove selected server</string>
     <string name="server_empty_desc">No servers. Try add one.</string>
