@@ -122,8 +122,11 @@ public class AddFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.action_add).setVisible(false);
-        menu.findItem(R.id.action_disconnect).setVisible(false);
+        MenuItem add = menu.findItem(R.id.action_add);
+        MenuItem dis = menu.findItem(R.id.action_disconnect);
+
+        if (add != null) add.setVisible(false);
+        if (dis != null) dis.setVisible(false);
 
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setIcon(new ColorDrawable(getResources().getColor(android.R.color.transparent)));
