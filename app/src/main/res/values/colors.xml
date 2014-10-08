@@ -9,4 +9,6 @@
     <color name="lvHeaderTextColor">#03A9F5</color>
     <color name="lvHeaderDividerColor">#03A9F5</color>
     <color name="lvDividerColor">#E0E0E0</color>
+
+    <color name="actionbar_item_pressed">#55e1f5fe</color>
 </resources>
