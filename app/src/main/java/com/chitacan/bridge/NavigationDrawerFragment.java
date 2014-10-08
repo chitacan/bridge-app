@@ -164,18 +164,6 @@ public class NavigationDrawerFragment
         return v;
     }
 
-    @Override
-    public void onResume() {
-        BusProvider.getInstance().register(this);
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        BusProvider.getInstance().unregister(this);
-        super.onPause();
-    }
-
     public boolean isDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
     }
@@ -365,19 +353,17 @@ public class NavigationDrawerFragment
         void onNavigationDrawerItemSelected(Bundle bundle);
     }
 
-    @Subscribe
-    public void bridgeEvent(BridgeEvent event) {
-        if (event.type != BridgeEvent.STATUS) return;
+    public void openDrawer() {
+        mDrawerLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerLayout.openDrawer(mFragmentContainerView);
+            }
+        }, 500);
+    }
 
-        if (event.bundle == null) {
-            mDrawerLayout.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mDrawerLayout.openDrawer(mFragmentContainerView);
-                }
-            }, 500);
-        } else
-            mDrawerLayout.closeDrawers();
+    public void closeDrawer() {
+        mDrawerLayout.closeDrawers();
     }
 
     @Override

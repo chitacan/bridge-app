@@ -41,7 +41,7 @@ public class MainActivity extends Activity
 
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, StatusFragment.newInstance())
+                .replace(R.id.container, StatusFragment.newInstance(), "fragment_status")
                 .commit();
 
         Intent intent = new Intent(this, BridgeService.class);
@@ -116,7 +116,7 @@ public class MainActivity extends Activity
             case R.id.action_add:
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, AddFragment.newInstance("", ""))
+                        .replace(R.id.container, AddFragment.newInstance("", ""), "fragment_add")
                         .addToBackStack(null)
                         .commit();
                 return true;

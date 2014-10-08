@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -103,7 +101,7 @@ public class StatusFragment extends ListFragment {
         mList.add(new StatusItem(null, "connected", null, "server_connected"));
         mList.add(new StatusItem(null, "client ID", null, "clientId"));
 
-        mAdapter = new StatusListAdapter(getActivity(), mList);
+        mAdapter = new StatusListAdapter(getActivity());
         setListAdapter(mAdapter);
         setHasOptionsMenu(true);
     }
@@ -163,11 +161,21 @@ public class StatusFragment extends ListFragment {
             mAdapter.clear();
     }
 
+    private void openDrawerIfNeeded() {
+        NavigationDrawerFragment drawer = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+
+        if (drawer == null) return;
+
+        if (mAdapter.getCount() == 0)
+            drawer.openDrawer();
+    }
+
     @Subscribe
     public void bridgeEvent(BridgeEvent event) {
         switch(event.type) {
             case BridgeEvent.STATUS:
                 update(event.bundle);
+                openDrawerIfNeeded();
                 setListShown(true);
                 getActivity().invalidateOptionsMenu();
                 break;
@@ -183,8 +191,8 @@ public class StatusFragment extends ListFragment {
 
         private final LayoutInflater mInflater;
 
-        public StatusListAdapter(Context context, List<StatusItem> objects) {
-            super(context, 0, objects);
+        public StatusListAdapter(Context context) {
+            super(context, 0, new ArrayList<StatusItem>(0));
             mInflater = LayoutInflater.from(context);
         }
 
