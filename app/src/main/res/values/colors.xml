@@ -11,4 +11,5 @@
     <color name="lvDividerColor">#E0E0E0</color>
 
     <color name="actionbar_item_pressed">#55e1f5fe</color>
+    <color name="title_prefixcolor">#cecece</color>
 </resources>

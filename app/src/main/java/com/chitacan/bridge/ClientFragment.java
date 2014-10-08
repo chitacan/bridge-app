@@ -98,7 +98,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
         String prefix = getString(R.string.title_client_prefix);
         Spannable title = new SpannableString(prefix + mServerName);
         title.setSpan(
-                new ForegroundColorSpan(getResources().getColor(R.color.secondaryTextColor)),
+                new ForegroundColorSpan(getResources().getColor(R.color.title_prefixcolor)),
                 0,
                 prefix.length(),
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE
