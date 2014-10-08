@@ -31,4 +31,5 @@
     <dimen name="lvDividerWidth">1dp</dimen>
 
     <dimen name="lvSectionDividerMarginTop">5dp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
 </resources>

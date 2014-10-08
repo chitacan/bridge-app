@@ -106,6 +106,9 @@ public class MainActivity extends Activity
                         .addToBackStack(null)
                         .commit();
                 return true;
+            case R.id.action_about:
+                About.show(this);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
