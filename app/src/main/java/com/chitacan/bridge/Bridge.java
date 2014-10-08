@@ -1,10 +1,13 @@
 package com.chitacan.bridge;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -47,6 +50,7 @@ public class Bridge {
     public static final int MSG_SERVER_COLLAPSE   = 4;
     public static final int MSG_SERVER_BRIDGED    = 5;
 
+    private Context mContext;
     private ServerBridge mServer = null;
     private DaemonBridge mDaemon = null;
     private Bundle mBridgeInfo;
@@ -87,11 +91,12 @@ public class Bridge {
         }
     };
 
-    public Bridge() {
-        this(null);
+    public Bridge(Context context) {
+        this(context, null);
     }
 
-    public Bridge(BridgeListener listener) {
+    public Bridge(Context context, BridgeListener listener) {
+        mContext = context;
         mBridgeListener = listener;
     }
 
@@ -252,12 +257,29 @@ public class Bridge {
                 obj.put("type"         , Build.TYPE);
                 obj.put("version"      , Build.VERSION.RELEASE);
                 obj.put("sdk_version"  , Build.VERSION.SDK_INT);
+                obj.put("displayInfo"  , getDisplayInfo());
                 obj.put("clientId"     , mClientId);
                 return obj;
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
+        }
+
+        private JSONObject getDisplayInfo() throws JSONException {
+            DisplayMetrics metrics = new DisplayMetrics();
+            WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+            wm.getDefaultDisplay().getRealMetrics(metrics);
+
+            JSONObject obj = new JSONObject();
+            obj.put("density"      , metrics.density);
+            obj.put("densityDpi"   , metrics.densityDpi);
+            obj.put("height"       , metrics.heightPixels);
+            obj.put("width"        , metrics.widthPixels);
+            obj.put("scaledDensity", metrics.scaledDensity);
+            obj.put("xdpi"         , metrics.xdpi);
+            obj.put("ydpi"         , metrics.ydpi);
+            return obj;
         }
 
         public void emit(String event, final Object... args) {
