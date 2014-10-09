@@ -63,6 +63,9 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     }
 
     private void removeBridge() {
+        if (mBridge == null)
+            BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVED));
+
         if (mBridge != null) {
             mBridge.remove();
             mBridge = null;
