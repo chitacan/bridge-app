@@ -166,6 +166,7 @@ public class Bridge {
 
         public ServerBridge() {
             mOpt.forceNew             = true;
+            mOpt.reconnectionAttempts = 3;
             mOpt.reconnectionDelay    = 10 * 1000;
             mOpt.reconnectionDelayMax = 20 * 1000;
         }
