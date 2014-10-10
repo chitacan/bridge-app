@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -35,6 +36,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class Bridge {
 
+    private static final String NAME = "Bridge";
     public static final int MSG_DAEMON_ADBD_ERR   = -1;
     public static final int MSG_DAEMON_SERVER_ERR = -2;
     public static final int MSG_DAEMON_INIT       = 0;
@@ -56,6 +58,11 @@ public class Bridge {
     private Bundle mBridgeInfo;
     private BridgeListener mBridgeListener;
 
+    private static final int STATUS_NONE    = 0;
+    private static final int STATUS_CREATED = 1;
+    private static final int STATUS_REMOVED = 2;
+    private int mStatus = STATUS_NONE;
+
     private static final int MSG_CREATE = 0;
     private static final int MSG_UPDATE = 1;
     private static final int MSG_REMOVE = 2;
@@ -69,8 +76,12 @@ public class Bridge {
                 case MSG_CREATE:
                     if (mDaemon == null) return;
 
-                    if (mServer.isConnected() && mDaemon.isConnected())
+                    if (mServer.isConnected() && mDaemon.isConnected()) {
                         mBridgeListener.onBridgeCreated();
+                        mStatus = STATUS_CREATED;
+                        if (BuildConfig.DEBUG)
+                            Log.i(Util.createTag(NAME), "STATUS_CREATED");
+                    }
 
                     break;
 
@@ -79,9 +90,13 @@ public class Bridge {
                     break;
 
                 case MSG_REMOVE:
-                    if (!mServer.isConnected() && mDaemon == null)
+                    if (!mServer.isConnected() && mDaemon == null) {
                         mBridgeListener.onBridgeRemoved();
-
+                        mStatus = STATUS_REMOVED;
+                        if (BuildConfig.DEBUG)
+                            Log.i(Util.createTag(NAME), "STATUS_REMOVED");
+                        mMainHandler.removeMessages(MSG_REMOVE);
+                    }
                     break;
 
                 case MSG_ERROR:
@@ -142,6 +157,8 @@ public class Bridge {
     public Bundle getStatus() {
         Bundle bundle = new Bundle();
 
+        bundle.putInt("bridge_status", mStatus);
+
         if (mBridgeInfo != null)
             bundle.putAll(mBridgeInfo);
 
@@ -156,6 +173,7 @@ public class Bridge {
 
     private class ServerBridge {
 
+        private static final String NAME = "server";
         private Socket mSocket = null;
         private boolean isConnected = false;
         private DaemonBridge mDaemon = null;
@@ -340,10 +358,36 @@ public class Bridge {
 
         private void setStatus(int status) {
             mStatus = status;
+            if (BuildConfig.DEBUG)
+                Log.i(Util.createTag(NAME), getMessageString(status));
+
             if (status >= 0)
                 update();
             else
                 error();
+        }
+
+        private String getMessageString(int msgId) {
+            switch (msgId) {
+                case MSG_SERVER_ERR:
+                    return "MSG_SERVER_ERR";
+                case MSG_SERVER_TIMEOUT:
+                    return "MSG_SERVER_TIMEOUT";
+                case MSG_SERVER_INIT:
+                    return "MSG_SERVER_INIT";
+                case MSG_SERVER_CONNECTED:
+                    return "MSG_SERVER_CONNECTED";
+                case MSG_SERVER_DISCONNECT:
+                    return "MSG_SERVER_DISCONNECT";
+                case MSG_SERVER_RECONNECT:
+                    return "MSG_SERVER_RECONNECT";
+                case MSG_SERVER_COLLAPSE:
+                    return "MSG_SERVER_COLLAPSE";
+                case MSG_SERVER_BRIDGED:
+                    return "MSG_SERVER_BRIDGED";
+                default:
+                    return "NOT_DEFINED";
+            }
         }
 
         public String getSocketId() {
@@ -381,6 +425,8 @@ public class Bridge {
     }
 
     private class DaemonBridge extends Thread {
+
+        private static final String NAME = "daemon";
         private Selector mSelector = null;
         private ServerBridge mServer = null;
         private ArrayBlockingQueue mQueue = new ArrayBlockingQueue(10);
@@ -535,10 +581,30 @@ public class Bridge {
 
         private void setStatus(int status) {
             mStatus = status;
+            if (BuildConfig.DEBUG)
+                Log.i(Util.createTag(NAME), getMessageString(status));
+
             if (status >= 0)
                 update();
             else
                 error();
+        }
+
+        public String getMessageString(int msgId) {
+            switch (msgId) {
+                case MSG_DAEMON_ADBD_ERR:
+                    return "MSG_DAEMON_ADBD_ERR";
+                case MSG_DAEMON_SERVER_ERR:
+                    return "MSG_DAEMON_SERVER_ERR";
+                case MSG_DAEMON_INIT:
+                    return "MSG_DAEMON_INIT";
+                case MSG_DAEMON_CONNECTED:
+                    return "MSG_DAEMON_CONNECTED";
+                case MSG_DAEMON_DISCONNECT:
+                    return "MSG_DAEMON_DISCONNECT";
+                default:
+                    return "NOT_DEFINED";
+            }
         }
 
         public boolean isConnected() {
