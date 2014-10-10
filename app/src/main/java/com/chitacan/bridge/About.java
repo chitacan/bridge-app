@@ -47,20 +47,9 @@ public class About {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get app version
-            PackageManager pm = getActivity().getPackageManager();
-            String packageName = getActivity().getPackageName();
-            String versionName;
-            try {
-                PackageInfo info = pm.getPackageInfo(packageName, 0);
-                versionName = info.versionName;
-            } catch (PackageManager.NameNotFoundException e) {
-                versionName = VERSION_UNAVAILABLE;
-            }
-
             // Build the about body view and append the link to see OSS licenses
             SpannableStringBuilder aboutBody = new SpannableStringBuilder();
-            aboutBody.append(Html.fromHtml(getString(R.string.about_body, versionName)));
+            aboutBody.append(Html.fromHtml(getString(R.string.about_body, BuildConfig.VERSION_NAME)));
 
             SpannableString licensesLink = new SpannableString(getString(R.string.about_licenses));
             licensesLink.setSpan(new ClickableSpan() {
