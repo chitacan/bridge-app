@@ -149,7 +149,7 @@ public class StatusFragment extends ListFragment {
     }
 
     private void update(Bundle bundle) {
-        if (bundle == null) {
+        if (bundle == null || bundle.getInt("bridge_status") == 2) {
             showDisconnectStatus();
             return;
         }
@@ -186,12 +186,6 @@ public class StatusFragment extends ListFragment {
         switch(event.type) {
             case BridgeEvent.STATUS:
                 update(event.bundle);
-                openDrawerIfNeeded();
-                setListShown(true);
-                getActivity().invalidateOptionsMenu();
-                break;
-            case BridgeEvent.REMOVED:
-                update(null);
                 openDrawerIfNeeded();
                 setListShown(true);
                 getActivity().invalidateOptionsMenu();

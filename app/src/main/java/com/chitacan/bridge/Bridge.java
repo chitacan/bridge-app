@@ -58,7 +58,7 @@ public class Bridge {
     private Bundle mBridgeInfo;
     private BridgeListener mBridgeListener;
 
-    private static final int STATUS_NONE    = 0;
+    private static final int STATUS_NONE    = -1;
     private static final int STATUS_CREATED = 1;
     private static final int STATUS_REMOVED = 2;
     private int mStatus = STATUS_NONE;
@@ -77,8 +77,8 @@ public class Bridge {
                     if (mDaemon == null) return;
 
                     if (mServer.isConnected() && mDaemon.isConnected()) {
-                        mBridgeListener.onBridgeCreated();
                         mStatus = STATUS_CREATED;
+                        mBridgeListener.onStatusUpdate(getStatus());
                         if (BuildConfig.DEBUG)
                             Log.i(Util.createTag(NAME), "STATUS_CREATED");
                     }
@@ -91,11 +91,10 @@ public class Bridge {
 
                 case MSG_REMOVE:
                     if (!mServer.isConnected() && mDaemon == null) {
-                        mBridgeListener.onBridgeRemoved();
                         mStatus = STATUS_REMOVED;
+                        mBridgeListener.onStatusUpdate(getStatus());
                         if (BuildConfig.DEBUG)
                             Log.i(Util.createTag(NAME), "STATUS_REMOVED");
-                        mMainHandler.removeMessages(MSG_REMOVE);
                     }
                     break;
 
@@ -624,8 +623,6 @@ public class Bridge {
 
     interface BridgeListener {
         public void onStatusUpdate(Bundle bundle);
-        public void onBridgeCreated();
-        public void onBridgeRemoved();
         public void onBridgeError(Bundle bundle);
     }
 }

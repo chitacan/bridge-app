@@ -64,7 +64,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
 
     private void removeBridge() {
         if (mBridge == null)
-            BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVED));
+            BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS));
 
         if (mBridge != null) {
             mBridge.remove();
@@ -87,16 +87,6 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     @Override
     public void onStatusUpdate(Bundle bundle) {
         BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS, bundle));
-    }
-
-    @Override
-    public void onBridgeCreated() {
-        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATED));
-    }
-
-    @Override
-    public void onBridgeRemoved() {
-        BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVED));
     }
 
     @Override

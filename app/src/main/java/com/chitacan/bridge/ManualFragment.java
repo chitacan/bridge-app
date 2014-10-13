@@ -4,7 +4,6 @@ package com.chitacan.bridge;
  * Created by chitacan on 2014. 8. 20..
  */
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;

@@ -28,9 +28,6 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.squareup.otto.Subscribe;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
