@@ -60,10 +60,27 @@ public class StatusFragment extends ListFragment {
 
             return false;
         }
+
+        public StatusItem setValue(Bundle bundle) {
+            if (key == null) return this;
+
+            value = String.valueOf(bundle.get(key));
+            return this;
+        }
+
+        public StatusItem convertValue(String[] status) {
+            if (key == null || value == null) return this;
+
+            if (key.equals("server_status") || key.equals("daemon_status")) {
+                value = status[Integer.parseInt(value)];
+            }
+            return this;
+        }
     }
 
     private StatusListAdapter mAdapter;
     private ArrayList<StatusItem> mList = new ArrayList<StatusItem>();
+    private String[] mStatus;
 
     /**
      * Use this factory method to create a new instance of
@@ -87,6 +104,7 @@ public class StatusFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
+        mStatus= getResources().getStringArray(R.array.status);
 
         mList.clear();
         mList.add(new StatusItem("header", "Daemon"));
@@ -157,12 +175,9 @@ public class StatusFragment extends ListFragment {
         if (mAdapter.getCount() == 0)
             mAdapter.addAll(mList);
 
-        StatusItem item;
         for (int i = 0 ; i < mAdapter.getCount() ; i++) {
-            item = mAdapter.getItem(i);
-            if (item.key == null) continue;
+            mAdapter.getItem(i).setValue(bundle).convertValue(mStatus);
 
-            item.value = String.valueOf(bundle.get(item.key));
         }
         mAdapter.notifyDataSetChanged();
     }

@@ -37,20 +37,20 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class Bridge {
 
     private static final String NAME = "Bridge";
-    public static final int MSG_DAEMON_ADBD_ERR   = -1;
-    public static final int MSG_DAEMON_SERVER_ERR = -2;
-    public static final int MSG_DAEMON_INIT       = 0;
-    public static final int MSG_DAEMON_CONNECTED  = 1;
-    public static final int MSG_DAEMON_DISCONNECT = 2;
+    public static final int MSG_DAEMON_ADBD_ERR   = 0;
+    public static final int MSG_DAEMON_SERVER_ERR = 1;
+    public static final int MSG_DAEMON_INIT       = 2;
+    public static final int MSG_DAEMON_CONNECTED  = 3;
+    public static final int MSG_DAEMON_DISCONNECT = 4;
 
-    public static final int MSG_SERVER_ERR        = -1;
-    public static final int MSG_SERVER_TIMEOUT    = -2;
-    public static final int MSG_SERVER_INIT       = 0;
-    public static final int MSG_SERVER_CONNECTED  = 1;
-    public static final int MSG_SERVER_DISCONNECT = 2;
-    public static final int MSG_SERVER_RECONNECT  = 3;
-    public static final int MSG_SERVER_COLLAPSE   = 4;
-    public static final int MSG_SERVER_BRIDGED    = 5;
+    public static final int MSG_SERVER_ERR        = 5;
+    public static final int MSG_SERVER_TIMEOUT    = 6;
+    public static final int MSG_SERVER_INIT       = 7;
+    public static final int MSG_SERVER_CONNECTED  = 8;
+    public static final int MSG_SERVER_DISCONNECT = 9;
+    public static final int MSG_SERVER_RECONNECT  = 10;
+    public static final int MSG_SERVER_COLLAPSE   = 11;
+    public static final int MSG_SERVER_BRIDGED    = 12;
 
     private Context mContext;
     private ServerBridge mServer = null;
@@ -360,7 +360,7 @@ public class Bridge {
             if (BuildConfig.DEBUG)
                 Log.i(Util.createTag(NAME), getMessageString(status));
 
-            if (status >= 0)
+            if (status >= MSG_SERVER_INIT)
                 update();
             else
                 error();
@@ -583,7 +583,7 @@ public class Bridge {
             if (BuildConfig.DEBUG)
                 Log.i(Util.createTag(NAME), getMessageString(status));
 
-            if (status >= 0)
+            if (status >= MSG_DAEMON_INIT)
                 update();
             else
                 error();

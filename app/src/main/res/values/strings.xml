@@ -23,4 +23,19 @@
     <string name="title_about">About</string>
     <string name="ok">OK</string>
 
+    <string-array name="status">
+        <item>ADBD Error</item>
+        <item>Error</item>
+        <item>Started</item>
+        <item>Connected</item>
+        <item>Disconnected</item>
+        <item>Error</item>
+        <item>Timeout</item>
+        <item>Started</item>
+        <item>Connected</item>
+        <item>Disconnected</item>
+        <item>Reconnect</item>
+        <item>Collapse</item>
+        <item>Bridged</item>
+    </string-array>
 </resources>
