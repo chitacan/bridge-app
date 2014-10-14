@@ -261,6 +261,7 @@ public class Bridge {
 
                 @Override
                 public void call(Object... args) {
+                    mClientId = null;
                     setStatus(MSG_SERVER_COLLAPSE);
                 }
             });
