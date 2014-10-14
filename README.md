@@ -1,6 +1,6 @@
-# adb-bridge
+# bridge-app
 
-Bridge your adb connection to wherever you want.
+Android client for [bridge](https://github.com/chitacan/bridge).
 
 > show "normal connection vs bridge connection" image
 
