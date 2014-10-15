@@ -21,6 +21,9 @@
     ]]></string>
     <string name="about_licenses">Open Source Licenses</string>
     <string name="title_about">About</string>
+    <string name="dialog_title_error">Error</string>
+    <string name="dialog_error_adbd">Cannot connect to device\'s adbd port. Check adbd port in Settings.</string>
+    <string name="dialog_button_gosetting">Check Settings</string>
     <string name="ok">OK</string>
 
     <string-array name="status">

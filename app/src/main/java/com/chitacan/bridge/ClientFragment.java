@@ -2,8 +2,16 @@ package com.chitacan.bridge;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -16,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -254,11 +263,52 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                     NavUtils.navigateUpFromSameTask(getActivity());
                 break;
             case BridgeEvent.ERROR:
-                // TODO: show error Dialog??
                 setListShown(true);
-                Toast.makeText(getActivity(), "Bridge Error", Toast.LENGTH_LONG).show();
+                showErrorMessage(event.bundle);
                 BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVE));
                 break;
+        }
+    }
+
+    private void showErrorMessage(Bundle bundle) {
+        if (bundle == null)
+            Toast.makeText(getActivity(), "Bridge Error", Toast.LENGTH_LONG).show();
+
+        if (bundle.getInt("daemon_status") == 0) {
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            Fragment prev = fm.findFragmentByTag("dialog_licenses");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+
+            new ErrorDialog().show(ft, "dialog_licenses");
+        }
+    }
+
+    public static class ErrorDialog extends DialogFragment {
+
+        public ErrorDialog () {
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            return new AlertDialog.Builder(getActivity())
+                    .setIcon(R.drawable.ic_action_error)
+                    .setTitle(R.string.dialog_title_error)
+                    .setMessage(R.string.dialog_error_adbd)
+                    .setPositiveButton(R.string.dialog_button_gosetting,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                                    startActivity(intent);
+                                    dialog.dismiss();
+                                }
+                            }
+                    )
+                    .create();
         }
     }
 }

@@ -51,13 +51,6 @@ public class SettingsActivity extends PreferenceActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
      * Shows the simplified settings UI if the device configuration if the
      * device configuration dictates that a simplified, single-pane UI should be
@@ -74,8 +67,8 @@ public class SettingsActivity extends PreferenceActivity {
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("pref_adbd_port"));
-        bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_adb_port)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_sync_frequency)));
     }
 
     /** {@inheritDoc} */
