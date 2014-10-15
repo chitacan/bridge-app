@@ -58,7 +58,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
             mBridge.remove();
 
         if (bundle != null) {
-            bundle.putInt("adbport", getPortNumber());
+            bundle.putInt("adbd_port", getPortNumber());
 
             mBridge = new Bridge(this, this);
             mBridge.create(bundle);

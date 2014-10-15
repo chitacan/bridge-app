@@ -56,7 +56,7 @@ public class StatusFragment extends ListFragment {
         mList.clear();
 
         mList.add( StatusItem.create().title("Daemon"   ).header()                        );
-        mList.add( StatusItem.create().title("ADBD port").key("adbport"          ).pref() );
+        mList.add( StatusItem.create().title("ADBD port").key("adbd_port"        ).pref() );
         mList.add( StatusItem.create().title("Status"   ).key("daemon_status_msg")        );
         mList.add( StatusItem.create().title("connected").key("daemon_connected" )        );
 

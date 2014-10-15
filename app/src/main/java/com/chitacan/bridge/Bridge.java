@@ -136,7 +136,7 @@ public class Bridge {
         }
 
         if (mDaemon == null || !mDaemon.isAlive()) {
-            mDaemon = new DaemonBridge(bundle.getInt("adbport"));
+            mDaemon = new DaemonBridge(bundle.getInt("adbd_port"));
             mDaemon.setServer(mServer);
             mDaemon.start();
         }
@@ -440,14 +440,14 @@ public class Bridge {
 
         private InetSocketAddress mLAddr = null;
 
-        private int mAdbPort = 0;
+        private int mAdbdPort = 0;
         private int mStatus = DAEMON_INIT;
 
         private long mReceive  = 0;
         private long mTransmit = 0;
 
-        DaemonBridge(int adbPort) {
-            mAdbPort = adbPort;
+        DaemonBridge(int adbdPort) {
+            mAdbdPort = adbdPort;
             this.setName("Daemon");
         }
 
@@ -483,7 +483,7 @@ public class Bridge {
         private void init() throws IOException {
             mReceive  = 0;
             mTransmit = 0;
-            mLAddr = new InetSocketAddress("127.0.0.1", mAdbPort);
+            mLAddr = new InetSocketAddress("127.0.0.1", mAdbdPort);
             mSelector = Selector.open();
             channel = SocketChannel.open();
             channel.configureBlocking(false);
