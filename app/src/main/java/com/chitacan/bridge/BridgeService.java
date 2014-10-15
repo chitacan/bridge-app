@@ -2,8 +2,10 @@ package com.chitacan.bridge;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
@@ -54,12 +56,19 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
             mBridge.remove();
 
         if (bundle != null) {
-            if (!bundle.containsKey("adbport"))
-                bundle.putInt("adbport", 6666);
+            bundle.putInt("adbport", getPortNumber());
 
             mBridge = new Bridge(this, this);
             mBridge.create(bundle);
         }
+    }
+
+    private int getPortNumber() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        return Integer.parseInt( pref.getString(
+                getString(R.string.pref_key_adb_port),
+                getString(R.string.pref_default_adbd_port)
+        ));
     }
 
     private void removeBridge() {
