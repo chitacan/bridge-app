@@ -419,6 +419,7 @@ public class Bridge {
             bundle.putBoolean("server_connected", isConnected());
             bundle.putString("server_endpoint", mUrl);
             bundle.putInt("server_status", mStatus);
+            bundle.putString("server_status_msg", getMessageString(mStatus));
             bundle.putString("clientId", mClientId);
             return bundle;
         }
@@ -618,6 +619,7 @@ public class Bridge {
 
             bundle.putBoolean("daemon_connected", isConnected());
             bundle.putInt("daemon_status", mStatus);
+            bundle.putString("daemon_status_msg", getMessageString(mStatus));
             return bundle;
         }
     }

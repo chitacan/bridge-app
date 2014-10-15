@@ -61,27 +61,15 @@ public class StatusFragment extends ListFragment {
             return false;
         }
 
-        public StatusItem setValue(Bundle bundle) {
-            if (key == null) return this;
-            if (bundle.get(key) == null) return this;
+        public void setValue(Bundle bundle) {
+            if (key == null || bundle.get(key) == null) return;
             
             value = String.valueOf(bundle.get(key));
-            return this;
-        }
-
-        public StatusItem convertValue(String[] status) {
-            if (key == null || value == null) return this;
-
-            if (key.equals("server_status") || key.equals("daemon_status")) {
-                value = status[Integer.parseInt(value)];
-            }
-            return this;
         }
     }
 
     private StatusListAdapter mAdapter;
     private ArrayList<StatusItem> mList = new ArrayList<StatusItem>();
-    private String[] mStatus;
 
     /**
      * Use this factory method to create a new instance of
@@ -105,18 +93,17 @@ public class StatusFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
-        mStatus= getResources().getStringArray(R.array.status);
 
         mList.clear();
         mList.add(new StatusItem("header", "Daemon"));
         mList.add(new StatusItem(null, "ADBD port", null, "adbport", true));
-        mList.add(new StatusItem(null, "Status", null, "daemon_status"));
+        mList.add(new StatusItem(null, "Status", null, "daemon_status_msg"));
         mList.add(new StatusItem(null, "connected", null, "daemon_connected"));
 
         mList.add(new StatusItem("header", "Server"));
         mList.add(new StatusItem(null, "Name", null, "name"));
         mList.add(new StatusItem(null, "Endpoint", null, "server_endpoint"));
-        mList.add(new StatusItem(null, "Status", null, "server_status"));
+        mList.add(new StatusItem(null, "Status", null, "server_status_msg"));
         mList.add(new StatusItem(null, "connected", null, "server_connected"));
         mList.add(new StatusItem(null, "client ID", null, "clientId"));
 
@@ -177,7 +164,7 @@ public class StatusFragment extends ListFragment {
             mAdapter.addAll(mList);
 
         for (int i = 0 ; i < mAdapter.getCount() ; i++) {
-            mAdapter.getItem(i).setValue(bundle).convertValue(mStatus);
+            mAdapter.getItem(i).setValue(bundle);
 
         }
         mAdapter.notifyDataSetChanged();
