@@ -37,20 +37,20 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class Bridge {
 
     private static final String NAME = "Bridge";
-    public static final int MSG_DAEMON_ADBD_ERR   = 0;
-    public static final int MSG_DAEMON_SERVER_ERR = 1;
-    public static final int MSG_DAEMON_INIT       = 2;
-    public static final int MSG_DAEMON_CONNECTED  = 3;
-    public static final int MSG_DAEMON_DISCONNECT = 4;
+    public static final int DAEMON_ADBD_ERR   = 0;
+    public static final int DAEMON_SERVER_ERR = 1;
+    public static final int DAEMON_INIT       = 2;
+    public static final int DAEMON_CONNECTED  = 3;
+    public static final int DAEMON_DISCONNECT = 4;
 
-    public static final int MSG_SERVER_ERR        = 5;
-    public static final int MSG_SERVER_TIMEOUT    = 6;
-    public static final int MSG_SERVER_INIT       = 7;
-    public static final int MSG_SERVER_CONNECTED  = 8;
-    public static final int MSG_SERVER_DISCONNECT = 9;
-    public static final int MSG_SERVER_RECONNECT  = 10;
-    public static final int MSG_SERVER_COLLAPSE   = 11;
-    public static final int MSG_SERVER_BRIDGED    = 12;
+    public static final int SERVER_ERR        = 5;
+    public static final int SERVER_TIMEOUT    = 6;
+    public static final int SERVER_INIT       = 7;
+    public static final int SERVER_CONNECTED  = 8;
+    public static final int SERVER_DISCONNECT = 9;
+    public static final int SERVER_RECONNECT  = 10;
+    public static final int SERVER_COLLAPSE   = 11;
+    public static final int SERVER_BRIDGED    = 12;
 
     private Context mContext;
     private ServerBridge mServer = null;
@@ -179,7 +179,7 @@ public class Bridge {
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
         private String mClientId = "";
-        private int mStatus = MSG_SERVER_INIT;
+        private int mStatus = SERVER_INIT;
 
         public ServerBridge() {
             mOpt.forceNew             = true;
@@ -204,7 +204,7 @@ public class Bridge {
                 public void call(Object... args) {
                     isConnected = true;
                     mSocket.emit("bd-host", hostInfo());
-                    setStatus(MSG_SERVER_CONNECTED);
+                    setStatus(SERVER_CONNECTED);
                     mMainHandler.sendEmptyMessage(MSG_CREATE);
                 }
 
@@ -221,7 +221,7 @@ public class Bridge {
                 public void call(Object... args) {
                     isConnected = false;
                     String reason = (String) args[0];
-                    setStatus(MSG_SERVER_DISCONNECT);
+                    setStatus(SERVER_DISCONNECT);
                 }
 
             }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
@@ -230,20 +230,20 @@ public class Bridge {
                 public void call(Object... args) {
                     Exception e = (Exception) args[0];
                     e.printStackTrace();
-                    setStatus(MSG_SERVER_ERR);
+                    setStatus(SERVER_ERR);
                 }
 
             }).on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    setStatus(MSG_SERVER_TIMEOUT);
+                    setStatus(SERVER_TIMEOUT);
                 }
             }).on(Socket.EVENT_RECONNECTING, new Emitter.Listener() {
 
                 @Override
                 public void call(Object... args) {
-                    setStatus(MSG_SERVER_RECONNECT);
+                    setStatus(SERVER_RECONNECT);
                 }
             }).on("bs-bridged", new Emitter.Listener() {
 
@@ -252,7 +252,7 @@ public class Bridge {
                     try {
                         JSONObject obj = (JSONObject) args[0];
                         mClientId = obj.getString("client");
-                        setStatus(MSG_SERVER_BRIDGED);
+                        setStatus(SERVER_BRIDGED);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -262,7 +262,7 @@ public class Bridge {
                 @Override
                 public void call(Object... args) {
                     mClientId = "";
-                    setStatus(MSG_SERVER_COLLAPSE);
+                    setStatus(SERVER_COLLAPSE);
                 }
             });
         }
@@ -361,7 +361,7 @@ public class Bridge {
             if (BuildConfig.DEBUG)
                 Log.i(Util.createTag(NAME), getMessageString(status));
 
-            if (status >= MSG_SERVER_INIT)
+            if (status >= SERVER_INIT)
                 update();
             else
                 error();
@@ -369,22 +369,22 @@ public class Bridge {
 
         private String getMessageString(int msgId) {
             switch (msgId) {
-                case MSG_SERVER_ERR:
-                    return "MSG_SERVER_ERR";
-                case MSG_SERVER_TIMEOUT:
-                    return "MSG_SERVER_TIMEOUT";
-                case MSG_SERVER_INIT:
-                    return "MSG_SERVER_INIT";
-                case MSG_SERVER_CONNECTED:
-                    return "MSG_SERVER_CONNECTED";
-                case MSG_SERVER_DISCONNECT:
-                    return "MSG_SERVER_DISCONNECT";
-                case MSG_SERVER_RECONNECT:
-                    return "MSG_SERVER_RECONNECT";
-                case MSG_SERVER_COLLAPSE:
-                    return "MSG_SERVER_COLLAPSE";
-                case MSG_SERVER_BRIDGED:
-                    return "MSG_SERVER_BRIDGED";
+                case SERVER_ERR:
+                    return "SERVER_ERR";
+                case SERVER_TIMEOUT:
+                    return "SERVER_TIMEOUT";
+                case SERVER_INIT:
+                    return "SERVER_INIT";
+                case SERVER_CONNECTED:
+                    return "SERVER_CONNECTED";
+                case SERVER_DISCONNECT:
+                    return "SERVER_DISCONNECT";
+                case SERVER_RECONNECT:
+                    return "SERVER_RECONNECT";
+                case SERVER_COLLAPSE:
+                    return "SERVER_COLLAPSE";
+                case SERVER_BRIDGED:
+                    return "SERVER_BRIDGED";
                 default:
                     return "NOT_DEFINED";
             }
@@ -441,7 +441,7 @@ public class Bridge {
         private InetSocketAddress mLAddr = null;
 
         private int mAdbPort = 0;
-        private int mStatus = MSG_DAEMON_INIT;
+        private int mStatus = DAEMON_INIT;
 
         private long mReceive  = 0;
         private long mTransmit = 0;
@@ -454,26 +454,26 @@ public class Bridge {
         @Override
         public void run() {
             super.run();
-            int result = MSG_DAEMON_INIT;
+            int result = DAEMON_INIT;
             try {
                 init();
                 connect();
                 loop();
             } catch (ConnectException e) {
-                result = MSG_DAEMON_ADBD_ERR;
+                result = DAEMON_ADBD_ERR;
                 e.printStackTrace();
             } catch (IOException e) {
-                result = MSG_DAEMON_SERVER_ERR;
+                result = DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } catch (CancelledKeyException e) {
-                result = MSG_DAEMON_SERVER_ERR;
+                result = DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } catch (UnresolvedAddressException e) {
                 // no connection. (airplane mode)
-                result = MSG_DAEMON_SERVER_ERR;
+                result = DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } catch (JSONException e) {
-                result = MSG_DAEMON_SERVER_ERR;
+                result = DAEMON_SERVER_ERR;
                 e.printStackTrace();
             } finally {
                 close(result);
@@ -519,7 +519,7 @@ public class Bridge {
                     if (key.isConnectable()) {
                         if (sc.isConnectionPending()) {
                             sc.finishConnect();
-                            setStatus(MSG_DAEMON_CONNECTED);
+                            setStatus(DAEMON_CONNECTED);
                             mMainHandler.sendEmptyMessage(MSG_CREATE);
                             key.interestOps(SelectionKey.OP_READ);
                         }
@@ -557,8 +557,8 @@ public class Bridge {
                 e.printStackTrace();
             }
 
-            if (msg == MSG_DAEMON_INIT)
-                msg = MSG_DAEMON_DISCONNECT;
+            if (msg == DAEMON_INIT)
+                msg = DAEMON_DISCONNECT;
 
             setStatus(msg);
             mMainHandler.sendEmptyMessage(MSG_REMOVE);
@@ -585,7 +585,7 @@ public class Bridge {
             if (BuildConfig.DEBUG)
                 Log.i(Util.createTag(NAME), getMessageString(status));
 
-            if (status >= MSG_DAEMON_INIT)
+            if (status >= DAEMON_INIT)
                 update();
             else
                 error();
@@ -593,16 +593,16 @@ public class Bridge {
 
         public String getMessageString(int msgId) {
             switch (msgId) {
-                case MSG_DAEMON_ADBD_ERR:
-                    return "MSG_DAEMON_ADBD_ERR";
-                case MSG_DAEMON_SERVER_ERR:
-                    return "MSG_DAEMON_SERVER_ERR";
-                case MSG_DAEMON_INIT:
-                    return "MSG_DAEMON_INIT";
-                case MSG_DAEMON_CONNECTED:
-                    return "MSG_DAEMON_CONNECTED";
-                case MSG_DAEMON_DISCONNECT:
-                    return "MSG_DAEMON_DISCONNECT";
+                case DAEMON_ADBD_ERR:
+                    return "DAEMON_ADBD_ERR";
+                case DAEMON_SERVER_ERR:
+                    return "DAEMON_SERVER_ERR";
+                case DAEMON_INIT:
+                    return "DAEMON_INIT";
+                case DAEMON_CONNECTED:
+                    return "DAEMON_CONNECTED";
+                case DAEMON_DISCONNECT:
+                    return "DAEMON_DISCONNECT";
                 default:
                     return "NOT_DEFINED";
             }
