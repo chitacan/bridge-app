@@ -4,6 +4,7 @@
         android:defaultValue="@string/pref_default_adbd_port"
         android:inputType="numberDecimal"
         android:key="@string/pref_key_adb_port"
+        android:maxLength="5"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:title="@string/pref_title_adbd_port" />
