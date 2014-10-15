@@ -112,6 +112,10 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         super.onResume();
         mServerName.requestFocus();
         mImm.showSoftInput(mServerName, InputMethodManager.SHOW_IMPLICIT);
+
+        NavigationDrawerFragment nf = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        nf.closeDrawer();
     }
 
     @Override
