@@ -92,6 +92,8 @@ public class MainActivity extends Activity
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_add:
                 FragmentManager fragmentManager = getFragmentManager();
