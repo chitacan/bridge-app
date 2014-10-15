@@ -27,39 +27,6 @@ import java.util.ArrayList;
  */
 public class StatusFragment extends ListFragment {
 
-    private class StatusItem {
-        String title;
-        String value;
-        String bundleKey;
-        boolean isHeader;
-        boolean hasPref = false;
-
-        public StatusItem(boolean isHeader, String title) {
-            this(isHeader, title, null);
-        }
-
-        public StatusItem(boolean isHeader, String title, String bundleKey) {
-            this(isHeader, title, bundleKey, false);
-        }
-
-        public StatusItem(boolean isHeader, String title, String bundleKey, boolean hasPref) {
-            this.isHeader = isHeader;
-            this.title = title;
-            this.bundleKey = bundleKey;
-            this.hasPref = hasPref;
-        }
-
-        public boolean isHeader() {
-            return isHeader;
-        }
-
-        public void setValue(Bundle bundle) {
-            if (!bundle.containsKey(bundleKey)) return;
-            
-            value = String.valueOf(bundle.get(bundleKey));
-        }
-    }
-
     private StatusListAdapter mAdapter;
     private ArrayList<StatusItem> mList = new ArrayList<StatusItem>();
 
@@ -87,17 +54,18 @@ public class StatusFragment extends ListFragment {
         }
 
         mList.clear();
-        mList.add(new StatusItem(true,  "Daemon"                               ));
-        mList.add(new StatusItem(false, "ADBD port", "adbport"          , true ));
-        mList.add(new StatusItem(false, "Status"   , "daemon_status_msg"       ));
-        mList.add(new StatusItem(false, "connected", "daemon_connected"        ));
 
-        mList.add(new StatusItem(true,  "Server"                         ));
-        mList.add(new StatusItem(false, "Name"     , "name"              ));
-        mList.add(new StatusItem(false, "Endpoint" , "server_endpoint"   ));
-        mList.add(new StatusItem(false, "Status"   , "server_status_msg" ));
-        mList.add(new StatusItem(false, "connected", "server_connected"  ));
-        mList.add(new StatusItem(false, "client ID", "clientId"          ));
+        mList.add( StatusItem.create().title("Daemon"   ).header()                        );
+        mList.add( StatusItem.create().title("ADBD port").key("adbport"          ).pref() );
+        mList.add( StatusItem.create().title("Status"   ).key("daemon_status_msg")        );
+        mList.add( StatusItem.create().title("connected").key("daemon_connected" )        );
+
+        mList.add( StatusItem.create().title("Server"   ).header()                 );
+        mList.add( StatusItem.create().title("Name"     ).key("name")              );
+        mList.add( StatusItem.create().title("Endpoint" ).key("server_endpoint"  ) );
+        mList.add( StatusItem.create().title("Status"   ).key("server_status_msg") );
+        mList.add( StatusItem.create().title("connected").key("server_connected" ) );
+        mList.add( StatusItem.create().title("client ID").key("clientId"         ) );
 
         mAdapter = new StatusListAdapter(getActivity());
         setListAdapter(mAdapter);
@@ -156,7 +124,7 @@ public class StatusFragment extends ListFragment {
             mAdapter.addAll(mList);
 
         for (int i = 0 ; i < mAdapter.getCount() ; i++) {
-            mAdapter.getItem(i).setValue(bundle);
+            mAdapter.getItem(i).value(bundle);
 
         }
         mAdapter.notifyDataSetChanged();
@@ -168,7 +136,8 @@ public class StatusFragment extends ListFragment {
     }
 
     private void openDrawerIfNeeded() {
-        NavigationDrawerFragment drawer = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        NavigationDrawerFragment drawer = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         if (drawer == null) return;
 
@@ -204,16 +173,15 @@ public class StatusFragment extends ListFragment {
 
         @Override
         public boolean isEnabled(int position) {
-            return !mList.get(position).isHeader();
+            return !mList.get(position).isHeader;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             StatusItem item = mList.get(position);
-            boolean isHeader = item.isHeader();
-            convertView = getConvertView(convertView, parent, isHeader);
+            convertView = getConvertView(convertView, parent, item.isHeader);
 
-            if (isHeader) {
+            if (item.isHeader) {
                 TextView title = (TextView) convertView.findViewById(R.id.lv_list_hdr);
                 title.setText(item.title);
             } else {
