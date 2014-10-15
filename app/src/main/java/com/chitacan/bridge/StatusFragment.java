@@ -63,7 +63,8 @@ public class StatusFragment extends ListFragment {
 
         public StatusItem setValue(Bundle bundle) {
             if (key == null) return this;
-
+            if (bundle.get(key) == null) return this;
+            
             value = String.valueOf(bundle.get(key));
             return this;
         }
