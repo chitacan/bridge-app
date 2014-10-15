@@ -228,6 +228,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+
             if (convertView == null)
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.lv_client_item, parent, false);
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 
 import com.squareup.otto.Produce;
@@ -65,7 +66,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
 
     private int getPortNumber() {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        return Integer.parseInt( pref.getString(
+        return Integer.parseInt(pref.getString(
                 getString(R.string.pref_key_adb_port),
                 getString(R.string.pref_default_adbd_port)
         ));
@@ -85,12 +86,25 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     public void bridgeEvent(BridgeEvent event) {
         switch (event.type) {
             case BridgeEvent.CREATE:
+                wakeLock(true);
                 createBridge(event.bundle);
                 break;
             case BridgeEvent.REMOVE:
                 removeBridge();
+                wakeLock(false);
                 break;
         }
+    }
+
+    PowerManager.WakeLock mWakeLock;
+    private void wakeLock(boolean isAquire) {
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+
+        if (isAquire) {
+            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "bridge_wakelock");
+            mWakeLock.acquire();
+        } else
+            mWakeLock.release();
     }
 
     @Override
