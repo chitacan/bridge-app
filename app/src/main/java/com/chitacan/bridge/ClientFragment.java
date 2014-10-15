@@ -119,10 +119,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(getActivity());
-                return true;
             case R.id.action_connect:
                 getArguments().remove("clientId");
                 BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATE, getArguments()));

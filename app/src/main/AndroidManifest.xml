@@ -24,17 +24,19 @@
             android:authorities="com.chitacan.bridge" />
 
         <activity
-            android:name=".ClientActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
+            android:name=".ClientActivity"
+            android:parentActivityName=".MainActivity"></activity>
 
         <service
             android:name=".BridgeService"
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>
