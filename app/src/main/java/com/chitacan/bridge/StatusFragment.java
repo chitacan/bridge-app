@@ -28,43 +28,35 @@ import java.util.ArrayList;
 public class StatusFragment extends ListFragment {
 
     private class StatusItem {
-        String type;
         String title;
         String value;
-        String key;
+        String bundleKey;
+        boolean isHeader;
         boolean hasPref = false;
 
-        public StatusItem(String type, String title) {
-            this(type, title, null);
+        public StatusItem(boolean isHeader, String title) {
+            this(isHeader, title, null);
         }
 
-        public StatusItem(String type, String title, String value) {
-            this(type, title, value, null, false);
+        public StatusItem(boolean isHeader, String title, String bundleKey) {
+            this(isHeader, title, bundleKey, false);
         }
 
-        public StatusItem(String type, String title, String value, String key) {
-            this(type, title, value, key, false);
-        }
-
-        public StatusItem(String type, String title, String value, String key, boolean hasPref) {
-            this.type = type;
+        public StatusItem(boolean isHeader, String title, String bundleKey, boolean hasPref) {
+            this.isHeader = isHeader;
             this.title = title;
-            this.value= value;
-            this.key = key;
+            this.bundleKey = bundleKey;
             this.hasPref = hasPref;
         }
 
         public boolean isHeader() {
-            if (type == null) return false;
-            if (type.equals("header")) return true;
-
-            return false;
+            return isHeader;
         }
 
         public void setValue(Bundle bundle) {
-            if (key == null || bundle.get(key) == null) return;
+            if (!bundle.containsKey(bundleKey)) return;
             
-            value = String.valueOf(bundle.get(key));
+            value = String.valueOf(bundle.get(bundleKey));
         }
     }
 
@@ -95,17 +87,17 @@ public class StatusFragment extends ListFragment {
         }
 
         mList.clear();
-        mList.add(new StatusItem("header", "Daemon"));
-        mList.add(new StatusItem(null, "ADBD port", null, "adbport", true));
-        mList.add(new StatusItem(null, "Status", null, "daemon_status_msg"));
-        mList.add(new StatusItem(null, "connected", null, "daemon_connected"));
+        mList.add(new StatusItem(true,  "Daemon"                               ));
+        mList.add(new StatusItem(false, "ADBD port", "adbport"          , true ));
+        mList.add(new StatusItem(false, "Status"   , "daemon_status_msg"       ));
+        mList.add(new StatusItem(false, "connected", "daemon_connected"        ));
 
-        mList.add(new StatusItem("header", "Server"));
-        mList.add(new StatusItem(null, "Name", null, "name"));
-        mList.add(new StatusItem(null, "Endpoint", null, "server_endpoint"));
-        mList.add(new StatusItem(null, "Status", null, "server_status_msg"));
-        mList.add(new StatusItem(null, "connected", null, "server_connected"));
-        mList.add(new StatusItem(null, "client ID", null, "clientId"));
+        mList.add(new StatusItem(true,  "Server"                         ));
+        mList.add(new StatusItem(false, "Name"     , "name"              ));
+        mList.add(new StatusItem(false, "Endpoint" , "server_endpoint"   ));
+        mList.add(new StatusItem(false, "Status"   , "server_status_msg" ));
+        mList.add(new StatusItem(false, "connected", "server_connected"  ));
+        mList.add(new StatusItem(false, "client ID", "clientId"          ));
 
         mAdapter = new StatusListAdapter(getActivity());
         setListAdapter(mAdapter);

@@ -178,7 +178,7 @@ public class Bridge {
         private DaemonBridge mDaemon = null;
         private IO.Options mOpt = new IO.Options();
         private String mUrl = null;
-        private String mClientId = null;
+        private String mClientId = "";
         private int mStatus = MSG_SERVER_INIT;
 
         public ServerBridge() {
@@ -261,7 +261,7 @@ public class Bridge {
 
                 @Override
                 public void call(Object... args) {
-                    mClientId = null;
+                    mClientId = "";
                     setStatus(MSG_SERVER_COLLAPSE);
                 }
             });
@@ -310,7 +310,7 @@ public class Bridge {
             int    port = bundle.getInt("port");
 
             mUrl      = Util.createUrl(host, port, "bridge/daemon");
-            mClientId = bundle.getString("clientId");
+            mClientId = bundle.getString("clientId", "");
 
             if (mSocket != null) {
                 disconnect();

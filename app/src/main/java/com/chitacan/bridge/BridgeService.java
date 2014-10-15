@@ -15,6 +15,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
 
     private Bridge mBridge;
     private boolean mIsRegistered = false;
+    private PowerManager.WakeLock mWakeLock;
 
     public BridgeService() {
     }
@@ -96,7 +97,6 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         }
     }
 
-    PowerManager.WakeLock mWakeLock;
     private void wakeLock(boolean isAquire) {
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 
