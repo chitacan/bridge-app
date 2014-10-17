@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -168,6 +167,13 @@ public class Bridge {
             bundle.putAll(mDaemon.getStatus());
 
         return bundle;
+    }
+
+    public boolean isCreated() {
+        if (mStatus == STATUS_CREATED)
+            return true;
+        else
+            return false;
     }
 
     private class ServerBridge {

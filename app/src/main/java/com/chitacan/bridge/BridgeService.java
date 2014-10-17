@@ -1,6 +1,10 @@
 package com.chitacan.bridge;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +17,7 @@ import com.squareup.otto.Subscribe;
 
 public class BridgeService extends Service implements Bridge.BridgeListener {
 
+    private static final int mNotificationID = 1111;
     private Bridge mBridge;
     private boolean mIsRegistered = false;
     private PowerManager.WakeLock mWakeLock;
@@ -97,6 +102,40 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         }
     }
 
+    private void notifyUser(Bundle bundle) {
+        String name     = bundle.getString("name");
+        String endPoint = bundle.getString("server_endpoint");
+
+        Notification.InboxStyle inbox = new Notification.InboxStyle();
+        inbox.addLine("Server : " + name);
+        inbox.addLine("EndPoint :" + endPoint);
+
+        Notification.Builder builder = new Notification.Builder(this)
+                .setTicker("Bridge Crated")
+                .setSmallIcon(R.drawable.ic_fa_cloud)
+                .setContentTitle("Bridge Created")
+                .setContentIntent(createContentIntent())
+                .setContentText("Connected to " + name)
+                .setStyle(inbox);
+
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(mNotificationID, builder.build());
+    }
+
+    private void denotify() {
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.cancel(mNotificationID);
+    }
+
+    private PendingIntent createContentIntent() {
+        Intent intent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(intent);
+
+        return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     private void wakeLock(boolean isAquire) {
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 
@@ -112,6 +151,11 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
 
     @Override
     public void onStatusUpdate(Bundle bundle) {
+        if (mBridge != null && mBridge.isCreated())
+            notifyUser(bundle);
+        else
+            denotify();
+
         BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS, bundle));
     }
 
