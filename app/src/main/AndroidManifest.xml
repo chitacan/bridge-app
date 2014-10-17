@@ -38,6 +38,12 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity"></activity>
+
+        <receiver android:name="com.chitacan.bridge.BridgeService$NotificationReceiver">
+            <intent-filter>
+                <action android:name="com.chitacan.bridge.notification"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

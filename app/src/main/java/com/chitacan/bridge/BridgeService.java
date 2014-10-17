@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,7 +19,6 @@ import com.squareup.otto.Subscribe;
 
 public class BridgeService extends Service implements Bridge.BridgeListener {
 
-    private static final int mNotificationID = 1111;
     private Bridge mBridge;
     private boolean mIsRegistered = false;
     private PowerManager.WakeLock mWakeLock;
@@ -102,40 +103,6 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         }
     }
 
-    private void notifyUser(Bundle bundle) {
-        String name     = bundle.getString("name");
-        String endPoint = bundle.getString("server_endpoint");
-
-        Notification.InboxStyle inbox = new Notification.InboxStyle();
-        inbox.addLine("Server : " + name);
-        inbox.addLine("EndPoint :" + endPoint);
-
-        Notification.Builder builder = new Notification.Builder(this)
-                .setTicker("Bridge Crated")
-                .setSmallIcon(R.drawable.ic_fa_cloud)
-                .setContentTitle("Bridge Created")
-                .setContentIntent(createContentIntent())
-                .setContentText("Connected to " + name)
-                .setStyle(inbox);
-
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(mNotificationID, builder.build());
-    }
-
-    private void denotify() {
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.cancel(mNotificationID);
-    }
-
-    private PendingIntent createContentIntent() {
-        Intent intent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(intent);
-
-        return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
     private void wakeLock(boolean isAquire) {
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 
@@ -149,13 +116,20 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         }
     }
 
+    private void denotify() {
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.cancel(NotificationReceiver.mNotificationID);
+    }
+
     @Override
     public void onStatusUpdate(Bundle bundle) {
-        if (mBridge != null && mBridge.isCreated())
-            notifyUser(bundle);
-        else
+        if (mBridge != null && mBridge.isCreated()) {
+            Intent intent = new Intent("com.chitacan.bridge.notification");
+            intent.putExtra("bundle", bundle);
+            sendOrderedBroadcast(intent, null);
+        } else {
             denotify();
-
+        }
         BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS, bundle));
     }
 
@@ -167,5 +141,48 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     @Produce
     public BridgeEvent produceBridgeStatus() {
         return new BridgeEvent(BridgeEvent.STATUS, mBridge == null ? null : mBridge.getStatus());
+    }
+
+    public static class NotificationReceiver extends BroadcastReceiver {
+
+        public static final int mNotificationID = 1111;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getBundleExtra("bundle");
+            int status = bundle.getInt("bridge_status");
+            if (status == 1)
+                notifyUser(context, bundle);
+        }
+
+        private void notifyUser(Context context, Bundle bundle) {
+            String name   = bundle.getString("name");
+            String endPoint = bundle.getString("server_endpoint");
+
+            Notification.InboxStyle inbox = new Notification.InboxStyle();
+            inbox.addLine("Server : " + name);
+            inbox.addLine("EndPoint :" + endPoint);
+
+            Notification.Builder builder = new Notification.Builder(context)
+                    .setTicker("Bridge Crated")
+                    .setSmallIcon(R.drawable.ic_fa_cloud)
+                    .setContentTitle("Bridge Created")
+                    .setContentIntent(createContentIntent(context))
+                    .setContentText("Connected to " + name)
+                    .setOngoing(true)
+                    .setStyle(inbox);
+
+            NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+            nm.notify(mNotificationID, builder.build());
+        }
+
+        private PendingIntent createContentIntent(Context context) {
+            Intent intent = new Intent(context, MainActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addNextIntent(intent);
+
+            return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
     }
 }

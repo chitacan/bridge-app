@@ -1,9 +1,15 @@
 package com.chitacan.bridge;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * Created by chitacan on 2014. 9. 25..
@@ -43,6 +49,35 @@ public class Util {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private static HashMap<String, BroadcastReceiver> receivers = new HashMap<String, BroadcastReceiver>();
+
+    static void registerRejectReceiver(Activity activity, String key) {
+        IntentFilter filter = new IntentFilter("com.chitacan.bridge.notification");
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+
+        BroadcastReceiver receiver;
+        if (receivers.containsKey(key)) {
+            receiver = receivers.get(key);
+        } else {
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    abortBroadcast();
+                }
+            };
+            receivers.put(key, receiver);
+        }
+
+        activity.registerReceiver(receiver, filter);
+    }
+
+    static void unregisterRejectReceiver(Activity activity, String key) {
+        if (receivers.containsKey(key)) {
+            activity.unregisterReceiver(receivers.get(key));
+            receivers.remove(key);
         }
     }
 }

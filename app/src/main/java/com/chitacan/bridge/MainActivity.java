@@ -15,6 +15,8 @@ public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
                    AddFragment.OnFragmentInteractionListener {
 
+    private static String TAG = "MainActivity";
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -51,11 +53,13 @@ public class MainActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
+        Util.registerRejectReceiver(this, TAG);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        Util.unregisterRejectReceiver(this, TAG);
     }
 
     @Override

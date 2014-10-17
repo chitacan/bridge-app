@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 public class ClientActivity extends Activity implements ClientFragment.OnFragmentInteractionListener {
 
+    private static final String TAG = "ClientActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,6 +18,18 @@ public class ClientActivity extends Activity implements ClientFragment.OnFragmen
                     .add(R.id.container, ClientFragment.newInstance(getIntent().getExtras()))
                     .commit();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Util.registerRejectReceiver(this, TAG);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Util.unregisterRejectReceiver(this, TAG);
     }
 
     @Override
