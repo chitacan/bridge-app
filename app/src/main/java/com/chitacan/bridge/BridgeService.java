@@ -103,8 +103,11 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         if (isAquire) {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "bridge_wakelock");
             mWakeLock.acquire();
-        } else
+            Util.Log("AQUIRE_WAKELOCK");
+        } else {
             mWakeLock.release();
+            Util.Log("RELEASE_WAKELOCK");
+        }
     }
 
     @Override

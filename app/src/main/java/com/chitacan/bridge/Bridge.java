@@ -80,7 +80,7 @@ public class Bridge {
                         mStatus = STATUS_CREATED;
                         mBridgeListener.onStatusUpdate(getStatus());
                         if (BuildConfig.DEBUG)
-                            Log.i(Util.createTag(NAME), "STATUS_CREATED");
+                            Util.Log(NAME, "STATUS_CREATED");
                     }
 
                     break;
@@ -94,7 +94,7 @@ public class Bridge {
                         mStatus = STATUS_REMOVED;
                         mBridgeListener.onStatusUpdate(getStatus());
                         if (BuildConfig.DEBUG)
-                            Log.i(Util.createTag(NAME), "STATUS_REMOVED");
+                            Util.Log(NAME, "STATUS_REMOVED");
                     }
                     break;
 
@@ -359,7 +359,7 @@ public class Bridge {
         private void setStatus(int status) {
             mStatus = status;
             if (BuildConfig.DEBUG)
-                Log.i(Util.createTag(NAME), getMessageString(status));
+                Util.Log(NAME, getMessageString(status));
 
             if (status >= SERVER_INIT)
                 update();
@@ -583,7 +583,7 @@ public class Bridge {
         private void setStatus(int status) {
             mStatus = status;
             if (BuildConfig.DEBUG)
-                Log.i(Util.createTag(NAME), getMessageString(status));
+                Util.Log(NAME, getMessageString(status));
 
             if (status >= DAEMON_INIT)
                 update();
