@@ -53,6 +53,7 @@ public class MainActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
+        Util.denotify(this);
         Util.registerRejectReceiver(this, TAG);
     }
 

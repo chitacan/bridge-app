@@ -116,10 +116,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         }
     }
 
-    private void denotify() {
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.cancel(NotificationReceiver.mNotificationID);
-    }
+
 
     @Override
     public void onStatusUpdate(Bundle bundle) {
@@ -128,7 +125,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
             intent.putExtra("bundle", bundle);
             sendOrderedBroadcast(intent, null);
         } else {
-            denotify();
+            Util.denotify(this);
         }
         BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.STATUS, bundle));
     }
@@ -145,7 +142,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
 
     public static class NotificationReceiver extends BroadcastReceiver {
 
-        public static final int mNotificationID = 1111;
+        public static final int NOTIFICATION_STATUS_ID = 1111;
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -173,7 +170,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
                     .setStyle(inbox);
 
             NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-            nm.notify(mNotificationID, builder.build());
+            nm.notify(NOTIFICATION_STATUS_ID, builder.build());
         }
 
         private PendingIntent createContentIntent(Context context) {

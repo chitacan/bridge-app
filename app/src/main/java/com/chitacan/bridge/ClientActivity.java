@@ -23,6 +23,7 @@ public class ClientActivity extends Activity implements ClientFragment.OnFragmen
     @Override
     protected void onResume() {
         super.onResume();
+        Util.denotify(this);
         Util.registerRejectReceiver(this, TAG);
     }
 
