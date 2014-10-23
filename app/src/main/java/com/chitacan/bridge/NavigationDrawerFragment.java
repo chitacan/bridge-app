@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -421,6 +422,8 @@ public class NavigationDrawerFragment
                                 ServerProvider.CONTENT_URI,
                                 ServerProvider._ID + "=" + bundle.getInt("id"),
                                 null);
+
+                        new BackupManager(getActivity()).dataChanged();
                     }
                     mode.finish();
                     return true;

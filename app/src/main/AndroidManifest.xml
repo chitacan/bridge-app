@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.chitacan.bridge" >
+    package="com.chitacan.bridge">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -8,11 +8,12 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:backupAgent=".BridgeBackupAgent"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,8 +32,7 @@
         <service
             android:name=".BridgeService"
             android:enabled="true"
-            android:exported="true" >
-        </service>
+            android:exported="true"></service>
 
         <activity
             android:name=".SettingsActivity"
@@ -41,9 +41,12 @@
 
         <receiver android:name="com.chitacan.bridge.BridgeService$NotificationReceiver">
             <intent-filter>
-                <action android:name="com.chitacan.bridge.notification"/>
+                <action android:name="com.chitacan.bridge.notification" />
             </intent-filter>
         </receiver>
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIsT4nMHV8f2CbGGmd2iDnuRyk0iuOPi9ne2MC8w" />
     </application>
 
 </manifest>

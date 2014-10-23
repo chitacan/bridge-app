@@ -43,7 +43,7 @@ public class ServerProvider extends ContentProvider{
         uriMatcher.addURI(PROVIDER_NAME, "server/#", SERVER_ID);
     }
 
-    static final String DATABASE_NAME     = "bridge";
+    static final String DATABASE_NAME     = "db";
     static final String SERVER_TABLE_NAME = "servers";
     static final int DATABASE_VERSION     = 1;
     static final String CREATE_DB_TABLE =

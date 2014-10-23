@@ -3,6 +3,7 @@ package com.chitacan.bridge;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.backup.BackupManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -177,6 +178,8 @@ public class AddFragment extends Fragment implements View.OnClickListener {
         values.put(ServerProvider.SERVER_PORT, p);
 
         Uri uri = getActivity().getContentResolver().insert(ServerProvider.CONTENT_URI, values);
+
+        new BackupManager(getActivity()).dataChanged();
 
         return true;
     }
