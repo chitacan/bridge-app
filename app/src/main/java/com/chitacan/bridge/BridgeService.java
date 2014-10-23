@@ -148,22 +148,23 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getBundleExtra("bundle");
             int status = bundle.getInt("bridge_status");
-            if (status == 1)
+            if (status == 1 || status == 2)
                 notifyUser(context, bundle);
         }
 
         private void notifyUser(Context context, Bundle bundle) {
-            String name   = bundle.getString("name");
-            String endPoint = bundle.getString("server_endpoint");
+            String name  = bundle.getString("name");
+            String host  = bundle.getString("host");
 
             Notification.InboxStyle inbox = new Notification.InboxStyle();
-            inbox.addLine("Server : " + name);
-            inbox.addLine("EndPoint :" + endPoint);
+            inbox.addLine("Connected to " + name + " (" + host + ")");
+            inbox.addLine("Server : " + bundle.getString("server_status_msg"));
+            inbox.addLine("Daemon : " + bundle.getString("daemon_status_msg"));
 
             Notification.Builder builder = new Notification.Builder(context)
-                    .setTicker("Bridge Crated")
+                    .setTicker("Bridge Status")
                     .setSmallIcon(R.drawable.ic_fa_cloud)
-                    .setContentTitle("Bridge Created")
+                    .setContentTitle("Bridge Status")
                     .setContentIntent(createContentIntent(context))
                     .setContentText("Connected to " + name)
                     .setOngoing(true)
