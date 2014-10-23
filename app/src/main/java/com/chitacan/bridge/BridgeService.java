@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 
 import com.squareup.otto.Produce;
@@ -22,12 +23,14 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     private Bridge mBridge;
     private boolean mIsRegistered = false;
     private PowerManager.WakeLock mWakeLock;
+    private SharedPreferences mPref = null;
 
     public BridgeService() {
     }
 
     @Override
     public void onCreate() {
+        mPref = PreferenceManager.getDefaultSharedPreferences(this);
         super.onCreate();
     }
 
@@ -72,8 +75,7 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     }
 
     private int getPortNumber() {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        return Integer.parseInt(pref.getString(
+        return Integer.parseInt(mPref.getString(
                 getString(R.string.pref_key_adb_port),
                 getString(R.string.pref_default_adbd_port)
         ));
@@ -104,23 +106,28 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
     }
 
     private void wakeLock(boolean isAquire) {
+        boolean isPersist = mPref.getBoolean(getString(R.string.pref_key_bridge_persistence), true);
+
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 
         if (isAquire) {
+            if (!isPersist) return;
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "bridge_wakelock");
             mWakeLock.acquire();
             Util.Log("AQUIRE_WAKELOCK");
         } else {
-            mWakeLock.release();
+            if (mWakeLock != null) mWakeLock.release();
             Util.Log("RELEASE_WAKELOCK");
         }
     }
 
-
+    private boolean canNotify() {
+        return mPref.getBoolean(getString(R.string.pref_key_notifications_status), true);
+    }
 
     @Override
     public void onStatusUpdate(Bundle bundle) {
-        if (mBridge != null && mBridge.isCreated()) {
+        if (mBridge != null && mBridge.isCreated() && canNotify()) {
             Intent intent = new Intent("com.chitacan.bridge.notification");
             intent.putExtra("bundle", bundle);
             sendOrderedBroadcast(intent, null);
