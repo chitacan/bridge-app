@@ -20,15 +20,6 @@
         android:key="@string/pref_key_notifications_status"
         android:title="@string/pref_title_bridge_status_notification" />
 
-    <ListPreference
-        android:defaultValue="180"
-        android:entries="@array/pref_sync_frequency_titles"
-        android:entryValues="@array/pref_sync_frequency_values"
-        android:key="@string/pref_key_sync_frequency"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_title_sync_frequency" />
-
     <Preference android:title="@string/pref_title_system_sync_settings">
         <intent android:action="android.settings.SYNC_SETTINGS" />
     </Preference>
