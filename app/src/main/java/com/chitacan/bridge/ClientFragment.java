@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -51,6 +50,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     private String mServerHost;
     private int mServerPort;
     private ClientListAdapter mAdapter;
+    private boolean mIsUserRequested = false;
 
     private OnFragmentInteractionListener mListener;
 
@@ -128,6 +128,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_connect:
+                mIsUserRequested = true;
                 getArguments().remove("clientId");
                 BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATE, getArguments()));
                 setListShown(false);
@@ -170,7 +171,7 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
+        mIsUserRequested = true;
         RestKit.Client client = (RestKit.Client) l.getItemAtPosition(position);
         Bundle bundle = getArguments();
         bundle.putString("clientId", client.value);
@@ -204,7 +205,6 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
         getListView().postDelayed(new Runnable() {
             @Override
             public void run() {
-//                NavUtils.navigateUpFromSameTask(getActivity());
                 getActivity().setResult(Activity.RESULT_OK);
                 getActivity().finish();
             }
@@ -266,12 +266,15 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     public void bridgeEvent(BridgeEvent event) {
         switch(event.type) {
             case BridgeEvent.STATUS:
-                if (event.bundle != null && event.bundle.getInt("bridge_status") == 1) {
+                if (event.bundle != null                      &&
+                    event.bundle.getInt("bridge_status") == 1 &&
+                    mIsUserRequested) {
                     getActivity().setResult(Activity.RESULT_OK);
                     getActivity().finish();
                 }
                 break;
             case BridgeEvent.ERROR:
+                mIsUserRequested = false;
                 setListShown(true);
                 showErrorMessage(event.bundle);
                 BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.REMOVE));
