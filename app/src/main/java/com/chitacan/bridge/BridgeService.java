@@ -116,7 +116,11 @@ public class BridgeService extends Service implements Bridge.BridgeListener {
             mWakeLock.acquire();
             Util.Log("AQUIRE_WAKELOCK");
         } else {
-            if (mWakeLock != null) mWakeLock.release();
+            try {
+                if (mWakeLock != null) mWakeLock.release();
+            } catch (RuntimeException e) {
+               e.printStackTrace();
+            }
             Util.Log("RELEASE_WAKELOCK");
         }
     }
