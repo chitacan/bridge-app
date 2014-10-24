@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 
 
-
 public class ClientActivity extends Activity implements ClientFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "ClientActivity";

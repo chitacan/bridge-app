@@ -255,6 +255,19 @@ public class NavigationDrawerFragment
         }
     }
 
+    public void clearSelected() {
+        mDrawerListView.clearChoices();
+        for (int i = 0; i < mDrawerListView.getCount(); i++)
+            mDrawerListView.setItemChecked(i, false);
+        mDrawerListView.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
+            }
+        });
+        mCurrentSelectedPosition = 0;
+    }
+
     private Bundle getItem(int position) {
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         Bundle bundle = new Bundle();

@@ -24,7 +24,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -133,6 +132,11 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
                 BusProvider.getInstance().post(new BridgeEvent(BridgeEvent.CREATE, getArguments()));
                 setListShown(false);
                 return true;
+            case android.R.id.home:
+                getActivity().setResult(Activity.RESULT_CANCELED);
+                getActivity().finish();
+                return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -200,7 +204,9 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
         getListView().postDelayed(new Runnable() {
             @Override
             public void run() {
-                NavUtils.navigateUpFromSameTask(getActivity());
+//                NavUtils.navigateUpFromSameTask(getActivity());
+                getActivity().setResult(Activity.RESULT_OK);
+                getActivity().finish();
             }
         }, 1500);
     }
@@ -260,8 +266,10 @@ public class ClientFragment extends ListFragment implements Callback<List<RestKi
     public void bridgeEvent(BridgeEvent event) {
         switch(event.type) {
             case BridgeEvent.STATUS:
-                if (event.bundle != null && event.bundle.getInt("bridge_status") == 1)
-                    NavUtils.navigateUpFromSameTask(getActivity());
+                if (event.bundle != null && event.bundle.getInt("bridge_status") == 1) {
+                    getActivity().setResult(Activity.RESULT_OK);
+                    getActivity().finish();
+                }
                 break;
             case BridgeEvent.ERROR:
                 setListShown(true);

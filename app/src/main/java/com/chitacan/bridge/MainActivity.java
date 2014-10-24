@@ -70,7 +70,18 @@ public class MainActivity extends Activity
         intent.setClass(this, ClientActivity.class);
         intent.putExtras(bundle);
 
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 0:
+                if (resultCode == RESULT_CANCELED)
+                    mNavigationDrawerFragment.clearSelected();
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void restoreActionBar() {
@@ -107,6 +118,9 @@ public class MainActivity extends Activity
                         .addToBackStack(null)
                         .commit();
                 return true;
+            case R.id.action_disconnect:
+                mNavigationDrawerFragment.clearSelected();
+                return false;
             case R.id.action_about:
                 About.show(this);
                 return true;
