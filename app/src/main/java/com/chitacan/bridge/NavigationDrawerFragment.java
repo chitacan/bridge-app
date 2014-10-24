@@ -149,9 +149,9 @@ public class NavigationDrawerFragment
             @Override
             public void onClick(View v) {
                 FragmentManager fragmentManager = getFragmentManager();
-                if (!(fragmentManager.findFragmentById(R.id.container) instanceof AddFragment)) {
+                if (!(fragmentManager.findFragmentById(R.id.container) instanceof EditFragment)) {
                     fragmentManager.beginTransaction()
-                            .replace(R.id.container, AddFragment.newInstance("", ""))
+                            .replace(R.id.container, EditFragment.newInstance("", ""))
                             .addToBackStack(null)
                             .commit();
                 }

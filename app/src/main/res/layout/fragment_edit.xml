@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.chitacan.bridge.AddFragment">
+    tools:context="com.chitacan.bridge.EditFragment">
 
     <EditText
         android:id="@+id/edit_server_name"

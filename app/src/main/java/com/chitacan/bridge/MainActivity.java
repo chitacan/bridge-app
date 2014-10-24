@@ -13,7 +13,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-                   AddFragment.OnFragmentInteractionListener {
+                   EditFragment.OnFragmentInteractionListener {
 
     private static String TAG = "MainActivity";
 
@@ -114,7 +114,7 @@ public class MainActivity extends Activity
             case R.id.action_add:
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, AddFragment.newInstance("", ""), "fragment_add")
+                        .replace(R.id.container, EditFragment.newInstance("", ""), "fragment_edit")
                         .addToBackStack(null)
                         .commit();
                 return true;
