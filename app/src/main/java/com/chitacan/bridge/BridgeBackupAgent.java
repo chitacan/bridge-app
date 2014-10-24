@@ -15,7 +15,7 @@ import java.io.IOException;
 public class BridgeBackupAgent extends BackupAgentHelper{
 
     static final Object sDataLock = new Object();
-    static final String FILES_BACKUP_KEY = "bridge:";
+    static final String FILES_BACKUP_KEY = "bridge";
 
     @Override
     public void onCreate() {
