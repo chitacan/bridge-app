@@ -384,7 +384,7 @@ public class NavigationDrawerFragment
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
 
-            return inflater.inflate(android.R.layout.simple_list_item_activated_2, null);
+            return inflater.inflate(android.R.layout.simple_list_item_2, null);
         }
 
         @Override
@@ -392,6 +392,9 @@ public class NavigationDrawerFragment
 
             TextView title = (TextView) view.findViewById(android.R.id.text1);
             TextView host  = (TextView) view.findViewById(android.R.id.text2);
+
+            title.setTextColor(getResources().getColorStateList(R.color.serverlist_item_title_selector));
+            host .setTextColor(getResources().getColorStateList(R.color.serverlist_item_host_selector));
 
             title.setText(cursor.getString(COLUMN_IDX_NAME));
             host .setText(cursor.getString(COLUMN_IDX_HOST ));

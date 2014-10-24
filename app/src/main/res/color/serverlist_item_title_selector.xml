@@ -1,0 +1,4 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_activated="true" android:color="@color/actionbar_background"/>
+    <item android:color="@android:color/black" />
+</selector>
